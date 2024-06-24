@@ -7,6 +7,7 @@ This repository contains all of my configuration files and QOL scripts that make
 - i3: Window Manager that I use for quick navigation between workspaces.
 - Alacritty: Terminal Emulator. 
 - Scripts:
+    - debinstall: automates and handles the installation process of .deb files.
     - networkadmin: opens up orbi admin login url.
     - projects: uses fzf to list all git repositories and allows me to cd into that dir.
     - tmmux: a simple cli tmux manager script that lets me easily see all Tmux sessions. Create, kill, attach, and detach from Tmux sessions.

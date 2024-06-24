@@ -12,7 +12,7 @@ cp -r alacritty nvim i3 picom /home/dark/Documents/Programming/Dotfiles
 
 # Copy Scripts over to dotfiles directory
 cd /usr/local/bin || exit #Scripts from local/bin
-cp projects networkadmin cgpg todolist darkcompiler dotfiles tmmux cmv ccp mp4converter asmconvert pullrocketbooks openrocketbooks /home/dark/Documents/Programming/Dotfiles/scripts
+cp debinstall projects networkadmin cgpg todolist darkcompiler dotfiles tmmux cmv ccp mp4converter asmconvert pullrocketbooks openrocketbooks /home/dark/Documents/Programming/Dotfiles/scripts
 cd /home/dark/Documents/Programming/ || exit
 cp -r Scripts /home/dark/Documents/Programming/Dotfiles/scripts
 

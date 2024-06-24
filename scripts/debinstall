@@ -1,0 +1,26 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+  echo "Usage: $0 <path-to-deb-file>"
+  exit 1
+fi
+
+DEB_FILE=$1
+
+if [ ! -f "$DEB_FILE" ]; then
+  echo "Error: File '$DEB_FILE' not found!"
+  exit 1
+fi
+
+sudo dpkg -i "$DEB_FILE"
+if [ $? -ne 0 ]; then
+  echo "Error: Failed to install $DEB_FILE"
+  echo "Attempting to fix broken dependencies..."
+  sudo apt-get install -f
+  if [ $? -ne 0 ]; then
+    echo "Error: Failed to fix dependencies"
+    exit 1
+  fi
+fi
+
+echo "Installation complete!"
