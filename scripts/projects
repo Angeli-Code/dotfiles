@@ -1,0 +1,32 @@
+#!/bin/bash
+
+projects_file="/home/dark/Management/projects.txt"
+projects_dir=$(dirname "$projects_file")
+
+mkdir -p "$projects_dir"
+
+find /home/dark/ -type d -name ".git" 2>/dev/null | while read -r gitdir; do
+  repo_dir=$(dirname "$gitdir")
+  if [[ "$repo_dir" != */.* ]]; then
+    echo "$repo_dir"
+  fi
+done | awk '{
+    paths[$0] = 1
+    for (i=1; i<NF; i++) {
+        prefix = ""
+        for (j=1; j<=i; j++) prefix = prefix $j "/"
+        if (prefix in paths) delete paths[prefix]
+    }
+} END {
+    for (path in paths) print path
+}' FS="/" > "$projects_file"
+
+selected_repo=$(cat "$projects_file" | fzf)
+
+if [ -n "$selected_repo" ]; then
+  cd "$selected_repo" || exit 1
+  clear
+  exec $SHELL
+else
+  echo "No directory selected."
+fi

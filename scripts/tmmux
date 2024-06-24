@@ -1,10 +1,7 @@
 #!/bin/bash
 
-# ============================================================================
-# Tmux Manager Script: Acts as a quick way to handle all major Tmux commands.
-# ============================================================================
-
 CONFIG_FILE="$HOME/.tmux_manager_config"
+PROJECTS_FILE="$HOME/Management/projects.txt"
 REPO_URL="https://github.com/Angeli-Code/tmux-manager"
 
 load_config() {
@@ -26,37 +23,92 @@ display_menu() {
     echo
   fi
   echo "Available Tmux Sessions:"
-
   sessions=$(tmux list-sessions -F "#{session_name}" 2>/dev/null)
-
   if [ -z "$sessions" ]; then
     echo "No active sessions..."
   else
     echo "$sessions" | nl -s ': ' -w 1
   fi
-
   if [ "$DISPLAY_HELP" = true ]; then
     echo
     echo "Command List"
     echo "------------"
-    echo "'c' = create session"
-    echo "'a' = attach to session"
-    echo "'d' = detach from session"
-    echo "'k' = kill session(s)"
+    echo "'c' = create session (select directory from root)"
+    echo "'p' = create session from git repositories (projects in home dir)"
+    echo "'a' = attach to existing session"
+    echo "'d' = detach from current session"
+    echo "'k' = kill existing session(s)"
     echo "'r' = open repository"
-    echo "'e' = exit program"
+    echo "'q' = quit program"
+    echo "'t' = toggle commands display"
+    echo "'h' = display detailed help"
   fi
 }
 
-fzf_change_directory() {
-  local root_dir="/"
-  local command='find '"${root_dir}"' -type d -not -path "*/\.*" 2>/dev/null | fzf --prompt="Tmux Directory Selection:"'
+update_projects_list() {
+  mkdir -p "$(dirname "$PROJECTS_FILE")"
+  find "$HOME" -type d -name ".git" 2>/dev/null | while read -r gitdir; do
+    repo_dir=$(dirname "$gitdir")
+    if [[ "$repo_dir" != */.* ]]; then
+      echo "$repo_dir"
+    fi
+  done | awk '{
+      paths[$0] = 1
+      for (i=1; i<NF; i++) {
+          prefix = ""
+          for (j=1; j<=i; j++) prefix = prefix $j "/"
+          if (prefix in paths) delete paths[prefix]
+      }
+  } END {
+      for (path in paths) print path
+  }' FS="/" > "$PROJECTS_FILE"
+}
 
-  local selected_dir=$(eval $command)
+general_selection() {
+  local selected_dir=$(find / -path /proc -prune -o -path /sys -prune -o -type d 2>/dev/null | fzf --prompt="Select a directory: ")
+  echo "$selected_dir"
+}
 
-  if [ -n "$selected_dir" ]; then
-    cd "$selected_dir"
-  fi
+projects_selection() {
+  update_projects_list
+  local selected_project=$(cat "$PROJECTS_FILE" | fzf --prompt="Select a project: ")
+  echo "$selected_project"
+}
+
+display_help() {
+  clear
+  echo "==================="
+  echo " Tmux Manager Help"
+  echo "==================="
+  echo
+  echo "-------------------"
+  echo "Available Commands:"
+  echo "-------------------"
+  echo "'c' = Create a new Tmux session from a general directory selection (root directory)."
+  echo "'p' = Create a new Tmux session from a list of git repositories (within your home directory)."
+  echo "'a' = Attach to an existing Tmux session."
+  echo "'d' = Detach from the current Tmux session."
+  echo "'k' = Kill an existing Tmux session."
+  echo "'r' = Open the Tmux Manager repository URL."
+  echo "'q' = Quit the program."
+  echo "'t' = Toggle the command help display."
+  echo "'h' = Display this help documentation."
+  echo
+  echo "-------------------"
+  echo "Usage Instructions:"
+  echo "-------------------"
+  echo "1. Use 'c' to start a new session from any directory. This allows you to navigate your entire filesystem."
+  echo "2. Use 'p' to start a new session from your git repositories. This focuses on projects within your home directory."
+  echo "3. Use 'a' to attach to an existing session. Select the session number to attach."
+  echo "4. Use 'd' to detach from the current session."
+  echo "5. Use 'k' to kill a specific or all sessions. Select the session number or 'a' for all."
+  echo "6. Use 'r' to open the Tmux Manager repository in your default web browser."
+  echo "7. Use 'q' to quit the program."
+  echo "8. Use 't' to toggle the display of command help."
+  echo "9. Use 'h' to display this detailed help information."
+  echo
+  echo "For more detailed information, including the source code and README, type 'r' in the main menu to open the repository URL."
+  read -p "Press return to return to the menu..."
 }
 
 load_config
@@ -69,13 +121,18 @@ while true; do
   echo
 
   case $option in
-    c) # Create Tmux Session
+    c)
       clear
-      read -p "Session Name: " new_session_name
-      fzf_change_directory
-      tmux new-session -s "$new_session_name"
+      selected_dir=$(general_selection)
+      if [ -n "$selected_dir" ]; then
+        read -p "Session Name: " new_session_name
+        tmux new-session -s "$new_session_name" -c "$selected_dir"
+        echo "Changed directory to $selected_dir"
+      else
+        echo "No directory selected."
+      fi
       ;;
-    a) # Attach to an existing session
+    a)
       if [ -n "$sessions" ]; then
         stty -echo
         read -n1 session_number
@@ -91,10 +148,10 @@ while true; do
         fi
       fi
       ;;
-    d) # Detach from existing session.
+    d)
       tmux detach
       ;;
-    k) # Kill a session from the active list of sessions.
+    k)
       if [ -n "$sessions" ]; then
         stty -echo
         read -n1 session_number
@@ -110,18 +167,32 @@ while true; do
         fi
       fi
       ;;
-    e) # Exit Program
+    q)
       clear
       exit 0
       ;;
-    t) # Toggle Commands
+    t)
       DISPLAY_HELP=$([ "$DISPLAY_HELP" = true ] && echo false || echo true)
       save_config
       ;;
-    r) # Open Repository (Might now be up yet)
+    r)
       xdg-open "$REPO_URL" 2>/dev/null || open "$REPO_URL" 2>/dev/null &
       ;;
-    *) ;;
+    p)
+      selected_project=$(projects_selection)
+      if [ -n "$selected_project" ]; then
+        session_name=$(basename "$selected_project")
+        tmux new-session -s "$session_name" -c "$selected_project"
+        echo "Changed directory to $selected_project"
+      else
+        echo "No project selected."
+      fi
+      ;;
+    h)
+      display_help
+      ;;
+    *)
+      ;;
   esac
 done
 
