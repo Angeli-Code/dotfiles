@@ -5,6 +5,7 @@ This repository contains all of my configuration files and QOL scripts that make
 - Neovim: Text Editor (BTW), configuration files. Built from "scatch". A lot of structural and plugin inspiration from LazyVim and Primeagen's neovimrc.
 - Picom: Compositor that lets me make windows Opaque, blurred, and round out window corners.
 - i3: Window Manager that I use for quick navigation between workspaces.
+- Alacritty: Terminal Emulator. 
 - Scripts:
     - tmmux: a simple cli tmux manager script that lets me easily see all Tmux sessions. Create, kill, attach, and detach from Tmux sessions.
     - dotfiles: automation script that goes around my computer to update my most recent files for this my Dotfiles repository, then opens lazygit.
