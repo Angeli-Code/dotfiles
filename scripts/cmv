@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# ============================================================================================
+# CMV Script: A simple way to MV files using fzf to allow the user to fuzzy find their way to
+# a directory and then automatically moves the file to the selected directory.
+# ============================================================================================
+
+# Check if at least one file is passed as an argument. Notify and Exit if not.
+if [ "$#" -lt 1 ]; then
+	echo "No files provided. Please provide at least one file to move."
+	exit 1
+fi
+
+# Run fzf to allow the user to select a directory
+selected_dir=$(find / -type d -name ".*" -or -type d 2>/dev/null | fzf --prompt="Select destination directory: ")
+
+# Check if user selected a directory or not. Notify and Exit if not.
+if [ -z "$selected_dir" ]; then
+	echo "No directory selected."
+	sleep 1
+	exit 1
+fi
+
+# Iterate over each provided file argument.
+for selected_file in "$@"; do
+	# Check if the passed in file argument exists. Notify and continue if not.
+	if [ ! -f "$selected_file" ]; then
+		echo "File '$selected_file' does not exist. Skipping."
+		continue
+	fi
+
+	# Command to mv the passed in file argument to the selected file directory
+	sudo mv "$selected_file" "$selected_dir"
+
+	# Status message of whether the file was successfully moved or not.
+	if [ $? -eq 0 ]; then
+		echo "Moved '$selected_file' to '$selected_dir'."
+	else
+		echo "Failed to move '$selected_file'."
+	fi
+done

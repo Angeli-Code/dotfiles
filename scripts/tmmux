@@ -1,0 +1,127 @@
+#!/bin/bash
+
+# ============================================================================
+# Tmux Manager Script: Acts as a quick way to handle all major Tmux commands.
+# ============================================================================
+
+CONFIG_FILE="$HOME/.tmux_manager_config"
+REPO_URL="https://github.com/Angeli-Code/tmux-manager"
+
+load_config() {
+  if [ -f "$CONFIG_FILE" ]; then
+    source "$CONFIG_FILE"
+  else
+    DISPLAY_HELP=true
+  fi
+}
+
+save_config() {
+  echo "DISPLAY_HELP=$DISPLAY_HELP" >"$CONFIG_FILE"
+}
+
+display_menu() {
+  clear
+  if [ "$DISPLAY_HELP" = true ]; then
+    echo "Type 't' to toggle command help."
+    echo
+  fi
+  echo "Available Tmux Sessions:"
+
+  sessions=$(tmux list-sessions -F "#{session_name}" 2>/dev/null)
+
+  if [ -z "$sessions" ]; then
+    echo "No active sessions..."
+  else
+    echo "$sessions" | nl -s ': ' -w 1
+  fi
+
+  if [ "$DISPLAY_HELP" = true ]; then
+    echo
+    echo "Command List"
+    echo "------------"
+    echo "'c' = create session"
+    echo "'a' = attach to session"
+    echo "'d' = detach from session"
+    echo "'k' = kill session(s)"
+    echo "'r' = open repository"
+    echo "'e' = exit program"
+  fi
+}
+
+fzf_change_directory() {
+  local root_dir="/"
+  local command='find '"${root_dir}"' -type d -not -path "*/\.*" 2>/dev/null | fzf --prompt="Tmux Directory Selection:"'
+
+  local selected_dir=$(eval $command)
+
+  if [ -n "$selected_dir" ]; then
+    cd "$selected_dir"
+  fi
+}
+
+load_config
+
+while true; do
+  display_menu
+  stty -echo
+  read -n1 option
+  stty echo
+  echo
+
+  case $option in
+    c) # Create Tmux Session
+      clear
+      read -p "Session Name: " new_session_name
+      fzf_change_directory
+      tmux new-session -s "$new_session_name"
+      ;;
+    a) # Attach to an existing session
+      if [ -n "$sessions" ]; then
+        stty -echo
+        read -n1 session_number
+        stty echo
+        echo
+        session_name=$(echo "$sessions" | sed -n "${session_number}p")
+        if [ -n "$session_name" ]; then
+          if [ -n "$TMUX" ]; then
+            tmux switch-client -t "$session_name"
+          else
+            tmux attach-session -t "$session_name" 2>/dev/null
+          fi
+        fi
+      fi
+      ;;
+    d) # Detach from existing session.
+      tmux detach
+      ;;
+    k) # Kill a session from the active list of sessions.
+      if [ -n "$sessions" ]; then
+        stty -echo
+        read -n1 session_number
+        stty echo
+        echo
+        if [ "$session_number" = "a" ]; then
+          tmux kill-server
+        else
+          session_name=$(echo "$sessions" | sed -n "${session_number}p")
+          if [ -n "$session_name" ]; then
+            tmux kill-session -t "$session_name" 2>/dev/null
+          fi
+        fi
+      fi
+      ;;
+    e) # Exit Program
+      clear
+      exit 0
+      ;;
+    t) # Toggle Commands
+      DISPLAY_HELP=$([ "$DISPLAY_HELP" = true ] && echo false || echo true)
+      save_config
+      ;;
+    r) # Open Repository (Might now be up yet)
+      xdg-open "$REPO_URL" 2>/dev/null || open "$REPO_URL" 2>/dev/null &
+      ;;
+    *) ;;
+  esac
+done
+

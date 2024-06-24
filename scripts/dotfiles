@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# ==============================================================================================================================
+# Dotfiles Script: Easy automation script that allows me to jump around my computer. Copy files into the directory where I store
+# my Dotfiles as well as Commit and Push changes to github once the most recent version of the files are moved to the Dotfiles
+# directory.
+# ==============================================================================================================================
+
+# Copy ~/.config files to dotfiles directory
+cd ~/.config || exit
+cp -r alacritty nvim i3 picom /home/dark/Documents/Programming/Dotfiles
+
+# Copy Scripts over to dotfiles directory
+cd /usr/local/bin || exit #Scripts from local/bin
+cp cgpg todolist darkcompiler dotfiles tmmux cmv ccp mp4converter asmconvert pullrocketbooks openrocketbooks /home/dark/Documents/Programming/Dotfiles/scripts
+cd /home/dark/Documents/Programming/ || exit
+cp -r Scripts /home/dark/Documents/Programming/Dotfiles/scripts
+
+# Copy .zshrc file to dotfiles directory
+cd /home/dark || exit
+cp ~/.zshrc /home/dark/Documents/Programming/Dotfiles/
+cd /home/dark/Documents/Programming/Dotfiles || exit
+sudo mv /home/dark/Documents/Programming/Dotfiles/.zshrc /home/dark/Documents/Programming/Dotfiles/zshrc
+
+# Open neovim and run lazygit command
+nvim -c "term lazygit"

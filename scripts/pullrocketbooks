@@ -1,0 +1,211 @@
+#!/bin/python3
+
+"""
+Script that goes into my downloads folder. Lets me choose the zip file that I downloaded from google drive. Copies the Contents
+to my rocket-books directory. Sorts and allows for editing of files.
+"""
+
+import os
+import shutil
+import re
+import zipfile
+
+downloads_dir = "/home/dark/Downloads"
+target_dir = "/home/dark/Documents/Notebooks/Rocket-Books"
+
+
+class NoteFile:
+    def __init__(self, title, categories, filepath):
+        self.title = title
+        self.categories = categories
+        self.filepath = filepath
+
+    def display(self):
+        print(f"Title: {self.title}")
+        print(f"Categories: {', '.join(self.categories)}")
+        print(f"Filepath: {self.filepath}")
+
+
+def unzip_rocketbooks(zip_path, extract_to):
+    print("Unzipping Rocket-Books... ", end="", flush=True)
+    with zipfile.ZipFile(zip_path, "r") as zip_ref:
+        zip_ref.extractall(extract_to)
+    print("Done.")
+
+
+def find_zip_files(directory, pattern):
+    return [f for f in os.listdir(directory) if f.endswith(".zip") and pattern in f]
+
+
+def list_zip_files(zip_files):
+    print("Found the following Rocket-Books ZIP files:")
+    for idx, zip_file in enumerate(zip_files, start=1):
+        print(f"{idx}: {zip_file}")
+
+
+def get_numeric_input(prompt):
+    while True:
+        try:
+            value = int(input(prompt))
+            return value
+        except ValueError:
+            print("Invalid input. Please enter a valid number.")
+
+
+def select_zip_file(zip_files):
+    while True:
+        file_selection = get_numeric_input(
+            "Enter the number of the file you want to unzip: "
+        )
+        if 1 <= file_selection <= len(zip_files):
+            return zip_files[file_selection - 1]
+        else:
+            print(
+                f"Invalid selection. Please enter a number between 1 and {len(zip_files)}."
+            )
+
+
+def clean_target_directory(directory):
+    if os.path.exists(directory):
+        print("Cleaning target directory... ", end="", flush=True)
+        shutil.rmtree(directory)
+        print("Done.")
+
+
+def move_data(src_dir, dst_dir):
+    if not os.path.exists(dst_dir):
+        os.makedirs(dst_dir)
+
+    print("Moving data... ", end="", flush=True)
+    for item in os.listdir(src_dir):
+        s = os.path.join(src_dir, item)
+        d = os.path.join(dst_dir, item)
+        if os.path.isdir(s):
+            shutil.copytree(s, d, dirs_exist_ok=True)
+        else:
+            shutil.copy2(s, d)
+    print("Done.")
+
+
+def sort_data(directory):
+    note_files = []
+    for root, _, files in os.walk(directory):
+        for filename in files:
+            if filename.endswith(".jpg"):
+                match = re.match(r"^(.*?) \[(.*?)\]\.jpg$", filename)
+                if match:
+                    title = match.group(1).strip()
+                    categories = match.group(2).strip().split(",")
+                    categories = [cat.strip() for cat in categories]
+                    filepath = os.path.join(root, filename)
+                    note_files.append(NoteFile(title, categories, filepath))
+
+    def sort_key(note):
+        chapter_match = re.match(r"Chapter (\d+(\.\d+)?)", note.title)
+        if chapter_match:
+            return (
+                int(chapter_match.group(1).split(".")[0]),
+                int(chapter_match.group(1).split(".")[1])
+                if "." in chapter_match.group(1)
+                else 0,
+            )
+        else:
+            return (float("inf"), note.title)
+
+    note_files.sort(key=sort_key)
+    return note_files
+
+
+def display_tree(note_files):
+    print("Contents of the Rocket-Books directory:")
+    for root, dirs, files in os.walk(target_dir):
+        level = root.replace(target_dir, "").count(os.sep)
+        indent = " " * 4 * (level)
+        print("{}{}/".format(indent, os.path.basename(root)))
+        subindent = " " * 4 * (level + 1)
+        for f in files:
+            print("{}{}".format(subindent, f))
+        for d in dirs:
+            print("{}{}/".format(subindent, d))
+
+
+def confirm(note_files):
+    print("The following file structure will be created:")
+    for note in note_files:
+        new_directory = os.path.join(target_dir, *note.categories)
+        new_filepath = os.path.join(new_directory, f"{note.title}.jpg")
+        print(f"{os.path.join(*note.categories)}/{note.title}.jpg")
+
+    while True:
+        confirmation = input(
+            "Do you want to proceed with these changes? (yes/no): "
+        ).lower()
+        if confirmation in ["yes", "no"]:
+            return confirmation == "yes"
+        else:
+            print("Invalid input. Please enter 'yes' or 'no'.")
+
+
+def apply_changes(note_files):
+    print("Applying changes... ", end="", flush=True)
+    for note in note_files:
+        new_directory = os.path.join(target_dir, *note.categories)
+        if not os.path.exists(new_directory):
+            os.makedirs(new_directory)
+        new_filepath = os.path.join(new_directory, f"{note.title}.jpg")
+        shutil.move(note.filepath, new_filepath)
+        note.filepath = new_filepath
+    print("Done.")
+
+
+def clean_up(directory, zip_file):
+    print("Cleaning up... ", end="", flush=True)
+    shutil.rmtree(directory)
+    os.remove(zip_file)
+    print("Done.")
+
+
+def main():
+    zip_files = find_zip_files(downloads_dir, "Rocket-Books")
+    if not zip_files:
+        print("No Rocket-Books ZIP files found in Downloads directory.")
+        return
+
+    list_zip_files(zip_files)
+    selected_zip = select_zip_file(zip_files)
+
+    while True:
+        confirmation = input(
+            f"Selected {selected_zip}. Do you want to unzip it? (yes/no): "
+        ).lower()
+        if confirmation in ["yes", "no"]:
+            break
+        else:
+            print("Invalid input. Please enter 'yes' or 'no'.")
+
+    if confirmation == "yes":
+        unzip_rocketbooks(os.path.join(downloads_dir, selected_zip), downloads_dir)
+        print(f"Unzipped {selected_zip}")
+    else:
+        print("Unzip operation cancelled.")
+        return
+
+    clean_target_directory(target_dir)
+
+    move_data(os.path.join(downloads_dir, "Rocket-Books"), target_dir)
+    note_files = sort_data(target_dir)
+
+    display_tree(note_files)
+
+    if confirm(note_files):
+        apply_changes(note_files)
+        clean_up(
+            os.path.join(downloads_dir, "Rocket-Books"),
+            os.path.join(downloads_dir, selected_zip),
+        )
+
+    print("Script execution completed.")
+
+
+if __name__ == "__main__":
+    main()

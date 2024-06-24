@@ -1,0 +1,42 @@
+#!/bin/bash
+# =================================================================================
+# CCP Script: A simple way to copy files without having to remember the path to
+# where you want to copy the file. Using fzf to select a directory. You can easily
+# fuzzy find your way to the file and the script will copy the file to the selected
+# directory.
+# =================================================================================
+
+# Check if at least one file is passed as an argument. Notify and Exit if not.
+if [ "$#" -lt 1 ]; then
+	echo "No files provided. Please provide at least one file to copy."
+	exit 1
+fi
+
+# Run fzf to allow the user to select where they want to copy the files to.
+selected_dir=$(find / -type d -name ".*" -or -type d 2>/dev/null | fzf --prompt="Select file copy destination: ")
+
+# Check if the user selected a directory. Notify and Exit if not.
+if [ -z "$selected_dir" ]; then
+	echo "No directory selected."
+	sleep 1
+	exit 1
+fi
+
+# Iterate over each provided file argument.
+for selected_file in "$@"; do
+	# Check if the passed in file argument exists. Notify and continue if not.
+	if [ ! -f "$selected_file" ]; then
+		echo "File '$selected_file' does not exist. Skipping."
+		continue
+	fi
+
+	# Copy the file to the selected directory.
+	cp "$selected_file" "$selected_dir"
+
+	# Status message on whether or not the file was successfully copied.
+	if [ $? -eq 0 ]; then
+		echo "Copied '$selected_file' to '$selected_dir'."
+	else
+		echo "Failed to copy '$selected_file'."
+	fi
+done

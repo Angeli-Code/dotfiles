@@ -1,0 +1,194 @@
+#!/bin/bash
+
+# Function to parse arguments
+parse_arguments() {
+  if [ "$#" -lt 1 ]; then
+    echo "Usage: darkcompiler <mainfilename.extension> [--javafx]"
+    exit 1
+  fi
+  FILENAME="$1"
+  JAVAFX_FLAG=false
+  if [[ "$*" == *"--javafx"* ]]; then
+    JAVAFX_FLAG=true
+  fi
+}
+
+# Function to get the file extension
+get_file_extension() {
+  FILE_EXTENSION="${FILENAME##*.}"
+}
+
+# Function to determine the project type
+determine_project_type() {
+  case "$FILE_EXTENSION" in
+    java)
+      if [ "$JAVAFX_FLAG" = true ]; then
+        PROJECT_TYPE="javafx"
+      else
+        PROJECT_TYPE="java"
+      fi
+      ;;
+    cpp)
+      PROJECT_TYPE="cpp"
+      ;;
+    c)
+      PROJECT_TYPE="c"
+      ;;
+    asm)
+      PROJECT_TYPE="assembly"
+      ;;
+    *)
+      echo "Unsupported file extension: $FILE_EXTENSION"
+      exit 1
+      ;;
+  esac
+}
+
+# Function to create a temporary directory within the original directory
+create_temp_dir() {
+  ORIGINAL_DIR=$(pwd)
+  TEMP_DIR="$ORIGINAL_DIR/TEMP_DIR"
+  if [ -d "$TEMP_DIR" ]; then
+    rm -rf "$TEMP_DIR"
+  fi
+  mkdir "$TEMP_DIR"
+}
+
+# Function to copy all necessary files to the temporary directory
+copy_files() {
+  cp "$FILENAME" "$TEMP_DIR"
+  if [ "$PROJECT_TYPE" == "cpp" ]; then
+    for file in *.cpp; do
+      cp "$file" "$TEMP_DIR"
+    done
+    for file in *.h; do
+      cp "$file" "$TEMP_DIR"
+    done
+  elif [ "$PROJECT_TYPE" == "c" ]; then
+    for file in *.c; do
+      cp "$file" "$TEMP_DIR"
+    done
+    for file in *.h; do
+      cp "$file" "$TEMP_DIR"
+    done
+  elif [ "$PROJECT_TYPE" == "java" ] || [ "$PROJECT_TYPE" == "javafx" ]; then
+    for file in *.java; do
+      cp "$file" "$TEMP_DIR"
+    done
+    for file in *.fxml; do
+      cp "$file" "$TEMP_DIR"
+    done
+  elif [ "$PROJECT_TYPE" == "assembly" ]; then
+    for file in *.asm; do
+      cp "$file" "$TEMP_DIR"
+    done
+  fi
+}
+
+# Function to get the compiler and run commands
+get_compiler_and_commands() {
+  case "$PROJECT_TYPE" in
+    java)
+      COMPILER="javac"
+      RUN_COMMAND="java"
+      ;;
+    javafx)
+      COMPILER="javac"
+      RUN_COMMAND="java --module-path $PATH_TO_FX --add-modules javafx.controls,javafx.fxml"
+      ;;
+    cpp)
+      COMPILER="g++"
+      RUN_COMMAND="./a.out"
+      ;;
+    c)
+      COMPILER="gcc"
+      RUN_COMMAND="./a.out"
+      ;;
+    assembly)
+      COMPILER="nasm"
+      RUN_COMMAND="./a.out"
+      ;;
+    *)
+      echo "Unsupported project type: $PROJECT_TYPE"
+      exit 1
+      ;;
+  esac
+}
+
+# Function to compile the code
+compile_code() {
+  cd "$TEMP_DIR" || exit
+  if [ "$PROJECT_TYPE" == "cpp" ]; then
+    "$COMPILER" *.cpp -o a.out
+  elif [ "$PROJECT_TYPE" == "c" ]; then
+    "$COMPILER" *.c -o a.out
+  elif [ "$PROJECT_TYPE" == "java" ]; then
+    "$COMPILER" *.java
+  elif [ "$PROJECT_TYPE" == "javafx" ]; then
+    "$COMPILER" --module-path "$PATH_TO_FX" --add-modules javafx.controls,javafx.fxml *.java
+  elif [ "$PROJECT_TYPE" == "assembly" ]; then
+    "$COMPILER" -felf64 "$FILENAME" -o output.o
+    ld -o a.out output.o
+  fi
+  if [ "$?" -ne 0 ]; then
+    echo "Compilation failed with errors:"
+    return 1
+  fi
+  return 0
+}
+
+# Function to handle compilation errors
+handle_compilation_error() {
+  ERROR_LOG="$ORIGINAL_DIR/error.txt"
+  read -p "Do you want to save the error log to error.txt? (y/n): " save_error_log
+  if [ "$save_error_log" == "y" ]; then
+    "$COMPILER" "$FILENAME" 2>"$ERROR_LOG"
+    echo "Error log saved to $ERROR_LOG"
+  fi
+  cleanup_temp_dir
+}
+
+# Function to handle successful compilation
+handle_successful_compilation() {
+  echo "Compilation successful."
+  read -p "Do you want to run the program? (y/n): " run_program
+  if [ "$run_program" == "y" ]; then
+    read -p "Do you want to see the return value? (y/n): " show_return_value
+    "$RUN_COMMAND"
+    if [ "$show_return_value" == "y" ]; then
+      echo "Program exited with return value: $?"
+    fi
+  fi
+
+  read -p "Do you want to overwrite the original directory with the temp directory contents? (y/n): " overwrite_original
+  if [ "$overwrite_original" == "y" ]; then
+    cp -r "$TEMP_DIR"/* "$ORIGINAL_DIR"
+    echo "Original directory has been overwritten with temp directory contents."
+  fi
+
+  cleanup_temp_dir
+}
+
+# Function to clean up the temporary directory
+cleanup_temp_dir() {
+  read -p "Do you want to keep the temporary directory? (y/n): " keep_temp
+  if [ "$keep_temp" == "n" ]; then
+    rm -rf "$TEMP_DIR"
+  else
+    echo "Temporary files kept in: $TEMP_DIR"
+  fi
+}
+
+# Main script execution
+parse_arguments "$@"
+get_file_extension
+determine_project_type
+create_temp_dir
+copy_files
+get_compiler_and_commands
+if ! compile_code; then
+  handle_compilation_error
+else
+  handle_successful_compilation
+fi
+

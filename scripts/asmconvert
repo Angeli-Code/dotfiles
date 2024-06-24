@@ -1,0 +1,66 @@
+#!/bin/bash
+
+# Function to compile Python to assembly
+compile_python() {
+	local source_file=$1
+	local output_file="${source_file%.py}.s"
+	cython -3 --embed "$source_file" -o temp.c
+	gcc -S temp.c -o "$output_file"
+	rm temp.c
+	echo "$output_file"
+}
+
+# Function to compile Java to assembly (bytecode disassembly)
+compile_java() {
+	local source_file=$1
+	local class_file="${source_file%.java}.class"
+	local output_file="${source_file%.java}.asm"
+	javac "$source_file"
+	javap -c "$class_file" >"$output_file"
+	rm "$class_file"
+	echo "$output_file"
+}
+
+# Function to compile C++ to assembly
+compile_cpp() {
+	local source_file=$1
+	local output_file="${source_file%.cpp}.s"
+	g++ -S "$source_file" -o "$output_file"
+	echo "$output_file"
+}
+
+# Function to compile C to assembly
+compile_c() {
+	local source_file=$1
+	local output_file="${source_file%.c}.s"
+	gcc -S "$source_file" -o "$output_file"
+	echo "$output_file"
+}
+
+# Main script
+if [ $# -ne 1 ]; then
+	echo "Usage: $0 <source_file>"
+	exit 1
+fi
+
+source_file=$1
+extension="${source_file##*.}"
+
+case $extension in
+py)
+	compile_python "$source_file"
+	;;
+java)
+	compile_java "$source_file"
+	;;
+cpp)
+	compile_cpp "$source_file"
+	;;
+c)
+	compile_c "$source_file"
+	;;
+*)
+	echo "Unsupported file extension: $extension"
+	exit 1
+	;;
+esac

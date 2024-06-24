@@ -1,0 +1,117 @@
+#!/bin/bash
+
+# Set the directory and file paths
+BASE_DIR="/home/dark/Management/gpg"
+PASSWORD_FILE="$BASE_DIR/passwords.txt"
+GITHUB_TOKEN_FILE="$BASE_DIR/githubtokens.txt"
+
+# Check if gpg is installed
+if ! command -v gpg &> /dev/null; then
+    echo "GPG is not installed. Please install it using 'sudo apt-get install gnupg'."
+    exit 1
+fi
+
+# Configure GPG to always ask for passphrase
+export GPG_TTY=$(tty)
+echo "default-cache-ttl 0" >> ~/.gnupg/gpg-agent.conf
+echo "max-cache-ttl 0" >> ~/.gnupg/gpg-agent.conf
+gpgconf --reload gpg-agent
+
+# Function to set up GPG
+setup_gpg() {
+    echo "Setting up GPG..."
+    echo "You will be prompted to enter your details and a passphrase for the key."
+    gpg --full-generate-key
+    echo "GPG setup complete. You can find your key ID using 'gpg --list-keys'."
+}
+
+# Function to encrypt a file
+encrypt_file() {
+    local input_file=$1
+    read -p "Enter the recipient email or key ID: " recipient
+    local output_file="${input_file}.gpg"
+
+    if gpg --output "$output_file" --encrypt --recipient "$recipient" "$input_file"; then
+        echo "File encrypted successfully: $output_file"
+        echo "For safety reasons, the original file '$input_file' will be securely deleted."
+        shred -u "$input_file"  # Securely delete the unencrypted file
+    else
+        echo "Failed to encrypt the file."
+    fi
+}
+
+# Function to decrypt a file
+decrypt_file() {
+    local input_file=$1
+    local output_file="${input_file%.gpg}"
+
+    if gpg --output "$output_file" --decrypt "$input_file"; then
+        echo "File decrypted successfully: $output_file"
+        cat "$output_file"
+    else
+        echo "Failed to decrypt the file."
+    fi
+}
+
+# Function to manage a file
+manage_file() {
+    local file=$1
+
+    if [[ -f "$file" ]]; then
+        echo "The file '$file' is not encrypted yet."
+        read -p "Do you want to encrypt this file before managing it? (y/n): " choice
+        case "$choice" in
+            y|Y )
+                encrypt_file "$file"
+                ;;
+            n|N )
+                echo "Continuing without encryption."
+                cat "$file"
+                ;;
+            * )
+                echo "Invalid choice."
+                ;;
+        esac
+    elif [[ -f "${file}.gpg" ]]; then
+        decrypt_file "${file}.gpg"
+        read -p "Do you want to edit the file? (y/n): " edit_choice
+        if [[ "$edit_choice" =~ ^[Yy]$ ]]; then
+            nano "${file%.gpg}"  # Open the file with nano editor for editing
+            echo "Re-encrypting the file..."
+            encrypt_file "${file%.gpg}"
+        else
+            echo "Leaving the file decrypted. Remember to re-encrypt it if you make changes."
+            read -p "Press any key to re-encrypt and securely delete the plaintext file."
+            encrypt_file "${file%.gpg}"
+        fi
+    else
+        echo "File does not exist. Creating a new one."
+        touch "$file"
+        encrypt_file "$file"
+    fi
+}
+
+# Main script
+echo "GPG Manager Script"
+echo "1. Manage Passwords"
+echo "2. Manage GitHub Tokens"
+echo "3. Set up GPG"
+read -p "Choose an option (1/2/3): " option
+
+case $option in
+    1)
+        echo "Password Management"
+        manage_file "$PASSWORD_FILE"
+        ;;
+    2)
+        echo "GitHub Token Management"
+        manage_file "$GITHUB_TOKEN_FILE"
+        ;;
+    3)
+        setup_gpg
+        ;;
+    *)
+        echo "Invalid option."
+        ;;
+esac
+

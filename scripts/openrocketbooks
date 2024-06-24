@@ -1,0 +1,60 @@
+#!/bin/python3
+
+"""
+Script that uses fzf to prompt me to select a file within my rocket-books directory.
+Then displays all the contents of the directory that that file is in, allowing for
+browsing of notes related to that file.
+"""
+
+import os
+
+target_dir = "/home/dark/Documents/Notebooks/Rocket-Books"
+
+def list_files(base_dir):
+    files = []
+    for root, dirs, file_names in os.walk(base_dir):
+        for file in file_names:
+            if file.endswith(".jpg"):
+                relative_path = os.path.relpath(os.path.join(root, file), base_dir)
+                files.append(relative_path)
+    return files
+
+def select_file(files):
+    try:
+        file_list = "\n".join(files)
+        with open('/tmp/fzf_input', 'w') as f:
+            f.write(file_list)
+        command = "cat /tmp/fzf_input | fzf > /tmp/fzf_output"
+        os.system(command)
+        with open('/tmp/fzf_output', 'r') as f:
+            selected_file = f.read().strip()
+        if selected_file:
+            return selected_file
+        else:
+            return None
+    except Exception as e:
+        return None
+
+def open_with_feh(directory, file):
+    full_path = os.path.join(directory, file)
+    os.system(f"feh --fullscreen --start-at '{full_path}' '{directory}'")
+
+def main():
+    if not os.path.exists(target_dir):
+        return
+
+    os.chdir(target_dir)
+    files = list_files(".")
+    if not files:
+        return
+
+    selected_file = select_file(files)
+    if selected_file:
+        selected_path = os.path.join(target_dir, selected_file)
+        directory = os.path.dirname(selected_path)
+        os.system("i3-msg workspace 5")
+        open_with_feh(directory, selected_path)
+
+if __name__ == "__main__":
+    main()
+

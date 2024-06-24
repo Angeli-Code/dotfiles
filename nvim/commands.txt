@@ -1,0 +1,60 @@
+==============================================================================
+                               Ghetto Which-Key
+==============================================================================
+Navigation:
+<leader>pv = Exit file back to netrw
+
+Management:
+<leader>l = Open lazy package manager GUI
+<leader>LG = Open Lazy Git
+<leader>ms = Open Mason LSP manager GUI
+
+Plugins:
+  - zen:
+              <leader>zz = Toggle Zen-Mode
+  - harpoon:
+              <leader>1 = Open Harpooned file at position 1
+              <leader>2 = Open Harpooned file at position 2
+              <leader>3 = Open Harpooned file at position 3
+              <leader>4 = Open Harpooned file at position 4
+              <leader>5 = Open Harpooned file at position 5
+              <leader>6 = Open Harpooned file at position 6
+              <leader>7 = Open Harpooned file at position 7
+              <leader>8 = Open Harpooned file at position 8
+              <leader>9 = Open Harpooned file at position 9
+  - trouble:
+              <leader>ctd = Open Diagnostics
+              <leader>ctb = Open Buffer Dianostics
+              <leader>cts = Open Symbols
+              <leader>ctl = Open LSP Definitions
+              <leader>ctL = Open Location List
+              <leader>ctq = Quick fixes
+  - undo-tree: 
+              <leader>ut = Open Undo-Tree
+  - lsp:
+              <leader>li = LSP Info
+              <leader>lf = Format Document
+              <leader>lr = Rename Symbol
+              <leader>la = Code Action
+              <leader>ld = Show Diagnostics
+              <leader>ln = Go to Next Diagnostic
+              <leader>lp = Go to Previous Diagnostic
+              <leader>lh = Hover Documentation
+              <leader>ls = Signature Help        
+  - telescope:
+              <leader>ff = Find files
+              <leader>fw = Live grep
+              <leader>fg = Find Git files
+
+    
+
+Personal Scripts:
+<leader>GS = Conduct a google search
+<leader>LS = Open a python server on current HTML file
+<leader>KS = Kill all python servers created
+<leader>PJ = Parse Java Documentation URL to a text file
+<leader>TD = Detach from current tmux session
+<leader>LN = Create a new text file that can be converted into a PDF note
+<leader>LC = Convert current file into a formatted docx file and save as a PDF
+<leader>ME = Make current file executable
+<leader>wk = Open this file to view neovim keymaps
