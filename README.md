@@ -7,6 +7,7 @@ This repository contains all of my configuration files and QOL scripts that make
 - i3: Window Manager that I use for quick navigation between workspaces.
 - Alacritty: Terminal Emulator. 
 - Scripts:
+    - networkadmin: opens up orbi admin login url.
     - tmmux: a simple cli tmux manager script that lets me easily see all Tmux sessions. Create, kill, attach, and detach from Tmux sessions.
     - dotfiles: automation script that goes around my computer to update my most recent files for this my Dotfiles repository, then opens lazygit.
     - pullrocketbooks: automated sorting script that sorts my rocket-book notes into their respective directories.

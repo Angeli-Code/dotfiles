@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# ==============================
+# Opens the Orbi Admin Login URL
+# ==============================
+
+URL="http://192.168.1.1"
+firefox "$URL" >/dev/null 2>&1 &
