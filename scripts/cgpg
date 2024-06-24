@@ -76,12 +76,11 @@ manage_file() {
         decrypt_file "${file}.gpg"
         read -p "Do you want to edit the file? (y/n): " edit_choice
         if [[ "$edit_choice" =~ ^[Yy]$ ]]; then
-            nano "${file%.gpg}"  # Open the file with nano editor for editing
+            vim "${file%.gpg}"  
             echo "Re-encrypting the file..."
             encrypt_file "${file%.gpg}"
         else
-            echo "Leaving the file decrypted. Remember to re-encrypt it if you make changes."
-            read -p "Press any key to re-encrypt and securely delete the plaintext file."
+            echo "Re-encrypting the file without editing..."
             encrypt_file "${file%.gpg}"
         fi
     else
