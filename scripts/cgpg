@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# ================================================================================
+# Script that I can easily use to manage my passwords and github tokens. I plan to 
+# expand this script to allow the user to create new items to manage but for now,
+# it only manages my github tokens and my passwords.
+# ================================================================================
+
 # Set the directory and file paths
 BASE_DIR="/home/dark/Management/gpg"
 PASSWORD_FILE="$BASE_DIR/passwords.txt"
