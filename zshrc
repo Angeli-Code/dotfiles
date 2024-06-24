@@ -111,6 +111,9 @@ export PATH="$HOME/.cargo/bin:$PATH"
 # Alias for Neovim 
 alias vim='nvim'
 
+# Alias for projects script
+alias projects='source /usr/local/bin/projects'
+
 # Function for Cooler Change Directory
 ccd() {
     local home_dir="$HOME"

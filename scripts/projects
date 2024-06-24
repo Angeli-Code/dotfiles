@@ -26,7 +26,8 @@ selected_repo=$(cat "$projects_file" | fzf)
 if [ -n "$selected_repo" ]; then
   cd "$selected_repo" || exit 1
   clear
-  exec $SHELL
+  ls
 else
   echo "No directory selected."
 fi
+
