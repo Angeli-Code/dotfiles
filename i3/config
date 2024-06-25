@@ -192,5 +192,5 @@ exec --no-startup-id feh --bg-fill /home/dark/Pictures/Wallpapers/wallpaper.png
 # Remove Window Borders
 default_border pixel 0
 
-# All Window Transparency/Blur (Personal Device Fix. Shouldn't need this normally)
+# All Window Transparency/Blur 
 exec --no-startup-id picom >/dev/null 2>&1 &
