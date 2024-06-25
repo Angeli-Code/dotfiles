@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
 
-# ======================================================================================================
-# Javadoc Parser Script: Parses out the data from Javadoc pages. Works in tandum with Neovim Autocommand
-# that allows the user to call this script but also save the file to a directory where I keep all parsed
-# class javadocs.
-# ======================================================================================================
-
 import requests
 from bs4 import BeautifulSoup
 import textwrap

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# Todolist Script: Automated commands that allow me to run my basic Java cli todolist application within a terminal.
-
 cd /home/dark/Documents/Programming/Scripts/cli-todo-app/
 javac AppDriver.java
 java AppDriver

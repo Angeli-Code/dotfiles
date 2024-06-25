@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Function to compile Python to assembly
 compile_python() {
 	local source_file=$1
 	local output_file="${source_file%.py}.s"
@@ -10,7 +9,6 @@ compile_python() {
 	echo "$output_file"
 }
 
-# Function to compile Java to assembly (bytecode disassembly)
 compile_java() {
 	local source_file=$1
 	local class_file="${source_file%.java}.class"
@@ -21,7 +19,6 @@ compile_java() {
 	echo "$output_file"
 }
 
-# Function to compile C++ to assembly
 compile_cpp() {
 	local source_file=$1
 	local output_file="${source_file%.cpp}.s"
@@ -29,7 +26,6 @@ compile_cpp() {
 	echo "$output_file"
 }
 
-# Function to compile C to assembly
 compile_c() {
 	local source_file=$1
 	local output_file="${source_file%.c}.s"
@@ -37,7 +33,6 @@ compile_c() {
 	echo "$output_file"
 }
 
-# Main script
 if [ $# -ne 1 ]; then
 	echo "Usage: $0 <source_file>"
 	exit 1

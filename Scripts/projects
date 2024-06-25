@@ -1,33 +1,53 @@
 #!/bin/bash
 
-projects_file="/home/dark/Management/projects.txt"
-projects_dir=$(dirname "$projects_file")
+setup_projects_directory() {
+  projects_file="/home/dark/Management/projects.txt"
+  projects_dir=$(dirname "$projects_file")
+  mkdir -p "$projects_dir"
+}
 
-mkdir -p "$projects_dir"
-
-find /home/dark/ -type d -name ".git" 2>/dev/null | while read -r gitdir; do
+find_git_repositories() {
+  local projects_file=$1
+  find /home/dark/ -type d -name ".git" 2>/dev/null | while read -r gitdir; do
   repo_dir=$(dirname "$gitdir")
   if [[ "$repo_dir" != */.* ]]; then
     echo "$repo_dir"
   fi
 done | awk '{
-    paths[$0] = 1
-    for (i=1; i<NF; i++) {
-        prefix = ""
-        for (j=1; j<=i; j++) prefix = prefix $j "/"
-        if (prefix in paths) delete paths[prefix]
+paths[$0] = 1
+for (i=1; i<NF; i++) {
+  prefix = ""
+  for (j=1; j<=i; j++) prefix = prefix $j "/"
+    if (prefix in paths) delete paths[prefix]
     }
-} END {
-    for (path in paths) print path
-}' FS="/" > "$projects_file"
+  } END {
+  for (path in paths) print path
+  }' FS="/" > "$projects_file"
+}
 
-selected_repo=$(cat "$projects_file" | fzf)
+select_repository() {
+  local projects_file=$1
+  cat "$projects_file" | fzf
+}
 
-if [ -n "$selected_repo" ]; then
-  cd "$selected_repo" || exit 1
-  clear
-  ls
-else
-  echo "No directory selected."
-fi
+navigate_to_repository() {
+  local selected_repo=$1
+  if [ -n "$selected_repo" ]; then
+    cd "$selected_repo" || exit 1
+    clear
+    ls
+  else
+    echo "No directory selected."
+  fi
+}
+
+main() {
+  setup_projects_directory
+  local projects_file="/home/dark/Management/projects.txt"
+  find_git_repositories "$projects_file"
+  local selected_repo=$(select_repository "$projects_file")
+  navigate_to_repository "$selected_repo"
+}
+
+main "$@"
 

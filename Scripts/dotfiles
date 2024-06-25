@@ -1,13 +1,29 @@
 #!/bin/bash
 
-cd ~/.config || exit
-cp -r alacritty nvim i3 picom /home/dark/Documents/Programming/Dotfiles
-cd /home/dark/Documents/Programming/ || exit
-cp -r Scripts /home/dark/Documents/Programming/Dotfiles/
-cd /usr/local/bin || exit 
-cp debinstall projects networkadmin cgpg todolist darkcompiler dotfiles tmmux cmv ccp mp4converter asmconvert pullrocketbooks openrocketbooks /home/dark/Documents/Programming/Dotfiles/Scripts
-cd /home/dark || exit
-cp ~/.zshrc /home/dark/Documents/Programming/Dotfiles/
-cd /home/dark/Documents/Programming/Dotfiles || exit
-sudo mv /home/dark/Documents/Programming/Dotfiles/.zshrc /home/dark/Documents/Programming/Dotfiles/zshrc
-nvim -c "term lazygit"
+update_configuration_files() {
+  cd ~/.config || exit
+  cp -r alacritty nvim i3 picom /home/dark/Documents/Programming/Dotfiles
+  cd /home/dark || exit
+  cp ~/.zshrc /home/dark/Documents/Programming/Dotfiles/
+}
+
+update_scripts() {
+  cd /home/dark/Documents/Programming/ || exit
+  cp -r Scripts /home/dark/Documents/Programming/Dotfiles/
+  cd /usr/local/bin || exit 
+  cp debinstall projects networkadmin cgpg todolist darkcompiler dotfiles tmmux cmv ccp mp4converter asmconvert pullrocketbooks openrocketbooks /home/dark/Documents/Programming/Dotfiles/Scripts
+  cd /home/dark/Documents/Programming/Dotfiles || exit
+  sudo mv /home/dark/Documents/Programming/Dotfiles/.zshrc /home/dark/Documents/Programming/Dotfiles/zshrc
+}
+
+start_lazygit() {
+  nvim -c "term lazygit"
+}
+
+main() {
+  update_configuration_files
+  update_scripts
+  start_lazygit
+}
+
+main

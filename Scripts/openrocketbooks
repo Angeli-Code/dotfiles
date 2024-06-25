@@ -1,11 +1,5 @@
 #!/bin/python3
 
-"""
-Script that uses fzf to prompt me to select a file within my rocket-books directory.
-Then displays all the contents of the directory that that file is in, allowing for
-browsing of notes related to that file.
-"""
-
 import os
 
 target_dir = "/home/dark/Documents/Notebooks/Rocket-Books"

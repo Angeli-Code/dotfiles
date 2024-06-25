@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
 
-"""
-    Script that allows me to compile a file into Assembly code. The file must be passed in as an argument. This
-works in tandum with neovim allowing for the current neovim file to be converted. View my autocommands to see more.
-
-"""
-
 import os
 import shutil
 import subprocess
@@ -19,7 +13,6 @@ def main():
     project_type = determine_project_type(file_extension, javafx_flag)
     temp_dir = create_temp_dir()
 
-    # Copy all Java files to the temporary directory
     if file_extension == ".java":
         copy_all_java_files(temp_dir)
 

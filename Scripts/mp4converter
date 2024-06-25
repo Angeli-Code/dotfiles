@@ -1,24 +1,33 @@
 #!/bin/bash
 
-# Script that allows me to convert a file to mp4.
+check_arguments() {
+  if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <input_file>"
+    exit 1
+  fi
+}
 
-# Check if the correct number of arguments is provided
-if [ "$#" -ne 1 ]; then
-	echo "Usage: $0 <input_file>"
-	exit 1
-fi
+get_filenames() {
+  input_file="$1"
+  output_file="${input_file%.*}.mp4"
+  echo "$input_file" "$output_file"
+}
 
-# Get the input file and output file names
-input_file="$1"
-output_file="${input_file%.*}.mp4"
+convert_file() {
+  ffmpeg -i "$1" -codec copy "$2"
+  if [ $? -eq 0 ]; then
+    echo "Conversion successful: $2"
+  else
+    echo "Conversion failed."
+    exit 1
+  fi
+}
 
-# Convert the file
-ffmpeg -i "$input_file" -codec copy "$output_file"
+main() {
+  check_arguments "$@"
+  read -r input_file output_file <<< $(get_filenames "$1")
+  convert_file "$input_file" "$output_file"
+}
 
-# Check if the conversion was successful
-if [ $? -eq 0 ]; then
-	echo "Conversion successful: $output_file"
-else
-	echo "Conversion failed."
-	exit 1
-fi
+main "$@"
+

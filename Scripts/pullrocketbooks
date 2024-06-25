@@ -1,10 +1,5 @@
 #!/bin/python3
 
-"""
-Script that goes into my downloads folder. Lets me choose the zip file that I downloaded from google drive. Copies the Contents
-to my rocket-books directory. Sorts and allows for editing of files.
-"""
-
 import os
 import shutil
 import re

@@ -44,6 +44,8 @@ ripgrep
 pulseaudio
 pavucontrol
 zathura
+python3-pip
+
 
 LazyGit
 =======
