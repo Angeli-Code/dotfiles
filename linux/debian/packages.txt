@@ -1,0 +1,79 @@
+Debian Package List
+===================
+Note: Some packages may be duplicated but I added for reassurance when looking for application specific packages.
+
+i3 (logout then open debian using i3)
+git
+build-essential
+cmake
+pkg-config
+libfreetype6-dev
+libfontconfig1-dev
+libxcb-xfixes0-dev
+libxkbcommon-dev
+ninja-build
+gettext
+libtool
+libtool-bin
+autoconf
+automake
+g++
+unzip
+curl
+doxygen
+xsel
+zsh
+curl
+ohmyzsh(curl) sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)
+nuts-zsh-theme(curl)
+gcc
+picom
+feh
+fzf
+npm
+nodejs
+nasm
+python3-venv
+python3-bs4
+python3-requests
+tmux
+default-jdk
+javafx (Manual handle with Tar... https://jdk.java.net/javafx23/)
+luarocks
+ripgrep
+pulseaudio
+pavucontrol
+zathura
+
+LazyGit
+=======
+LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
+curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+tar xf lazygit.tar.gz lazygit
+sudo install lazygit /usr/local/bin
+
+
+
+My Personal Configuration Files
+==============================
+git pull https://github.com/Angeli-Code/Dotfiles
+sudo mv picom nvim alacritty ~/.config
+
+
+Source Builds
+=============
+Alacritty:
+sudo apt update
+sudo apt install build-essential cmake pkg-config libfreetype6-dev libfontconfig1-dev libxcb-xfixes0-dev libxkbcommon-dev
+cargo install alacritty
+
+Neovim:
+sudo apt update
+sudo apt install ninja-build gettext libtool libtool-bin autoconf automake g++ pkg-config unzip curl doxygen
+git clone https://github.com/neovim/neovim.git
+cd neovim
+git checkout stable
+make CMAKE_BUILD_TYPE=Release
+sudo make install
+
+Note: I should turn this into a script maybe one day LOL. I have to make the scripts all universally usable before doing so. Main issue is file paths.

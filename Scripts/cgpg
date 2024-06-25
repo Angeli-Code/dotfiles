@@ -1,122 +1,315 @@
 #!/bin/bash
 
-# ================================================================================
-# Script that I can easily use to manage my passwords and github tokens. I plan to 
-# expand this script to allow the user to create new items to manage but for now,
-# it only manages my github tokens and my passwords.
-# ================================================================================
+CONFIG_FILE="$HOME/.gpg_manager_config"
 
-# Set the directory and file paths
-BASE_DIR="/home/dark/Management/gpg"
-PASSWORD_FILE="$BASE_DIR/passwords.txt"
-GITHUB_TOKEN_FILE="$BASE_DIR/githubtokens.txt"
+select_base_dir() {
+  if grep -q "^BASE_DIR=" "$CONFIG_FILE"; then
+    BASE_DIR=$(grep "^BASE_DIR=" "$CONFIG_FILE" | cut -d '=' -f 2)
+    if [[ -d $BASE_DIR ]]; then
+      echo "Using existing base directory: $BASE_DIR"
+      return
+    fi
+  fi
+  BASE_DIR=$(find ~ -type d 2> /dev/null | fzf --prompt="Select or create gpg-storage path: ")
+  if [[ -z "$BASE_DIR" ]]; then
+    echo "No directory selected. Exiting."
+    exit 1
+  fi
+  BASE_DIR="$BASE_DIR/gpg-storage"
+  mkdir -p "$BASE_DIR"
+  echo "BASE_DIR=$BASE_DIR" >> $CONFIG_FILE
+  echo "Base directory selected: $BASE_DIR"
+}
 
-# Check if gpg is installed
-if ! command -v gpg &> /dev/null; then
+check_dependencies() {
+  if ! command -v fzf &> /dev/null; then
+    echo "fzf is not installed. Please install it using 'sudo apt-get install fzf'."
+    exit 1
+  fi
+  if ! command -v gpg &> /dev/null; then
     echo "GPG is not installed. Please install it using 'sudo apt-get install gnupg'."
     exit 1
-fi
+  fi
+}
 
-# Configure GPG to always ask for passphrase
-export GPG_TTY=$(tty)
-echo "default-cache-ttl 0" >> ~/.gnupg/gpg-agent.conf
-echo "max-cache-ttl 0" >> ~/.gnupg/gpg-agent.conf
-gpgconf --reload gpg-agent
+setup_gpg_agent() {
+  export GPG_TTY=$(tty)
+  GPG_AGENT_CONF="$HOME/.gnupg/gpg-agent.conf"
+  if [[ ! -f $GPG_AGENT_CONF ]]; then
+    touch $GPG_AGENT_CONF
+  fi
+  if ! grep -q "default-cache-ttl 0" $GPG_AGENT_CONF; then
+    echo "default-cache-ttl 0" >> $GPG_AGENT_CONF
+    echo "max-cache-ttl 0" >> $GPG_AGENT_CONF
+    gpgconf --reload gpg-agent
+  fi
+}
 
-# Function to set up GPG
 setup_gpg() {
-    echo "Setting up GPG..."
-    echo "You will be prompted to enter your details and a passphrase for the key."
-    gpg --full-generate-key
-    echo "GPG setup complete. You can find your key ID using 'gpg --list-keys'."
+  echo "Setting up GPG..."
+  echo "You will be prompted to enter your details and a passphrase for the key."
+  gpg --full-generate-key
+  echo "GPG setup complete. You can find your key ID using 'gpg --list-keys'."
+  echo "GPG_SETUP_DONE=true" >> $CONFIG_FILE
 }
 
-# Function to encrypt a file
+add_new_key() {
+  echo "Adding a new GPG key..."
+  gpg --full-generate-key
+  echo "New GPG key added successfully."
+}
+
+check_gpg_setup() {
+  if gpg --list-keys &> /dev/null; then
+    echo "GPG_SETUP_DONE=true" >> $CONFIG_FILE
+    return 0
+  else
+    return 1
+  fi
+}
+
+verify_recipient() {
+  local recipient=$1
+  if ! gpg --list-keys "$recipient" &> /dev/null; then
+    echo "Recipient key '$recipient' not found. Please make sure you have imported the recipient's public key."
+    echo "To import a key, use: gpg --import <keyfile>"
+    return 1
+  fi
+  return 0
+}
+
 encrypt_file() {
-    local input_file=$1
-    read -p "Enter the recipient email or key ID: " recipient
-    local output_file="${input_file}.gpg"
-
-    if gpg --output "$output_file" --encrypt --recipient "$recipient" "$input_file"; then
-        echo "File encrypted successfully: $output_file"
-        echo "For safety reasons, the original file '$input_file' will be securely deleted."
-        shred -u "$input_file"  # Securely delete the unencrypted file
-    else
-        echo "Failed to encrypt the file."
-    fi
+  local input_file=$1
+  read -p "Enter the recipient email or key ID: " recipient
+  if ! verify_recipient "$recipient"; then
+    echo "Encryption failed. Please import the recipient's public key and try again."
+    return 1
+  fi
+  local output_file="${input_file}.gpg"
+  if gpg --output "$output_file" --encrypt --recipient "$recipient" "$input_file"; then
+    echo "File encrypted successfully: $output_file"
+    echo "For safety reasons, the original file '$input_file' will be securely deleted."
+    shred -u "$input_file"
+  else
+    echo "Failed to encrypt the file."
+  fi
 }
 
-# Function to decrypt a file
 decrypt_file() {
-    local input_file=$1
-    local output_file="${input_file%.gpg}"
-
-    if gpg --output "$output_file" --decrypt "$input_file"; then
-        echo "File decrypted successfully: $output_file"
-        cat "$output_file"
-    else
-        echo "Failed to decrypt the file."
-    fi
+  local input_file=$1
+  local output_file="${input_file%.gpg}"
+  if gpg --output "$output_file" --decrypt "$input_file"; then
+    echo "File decrypted successfully: $output_file"
+    echo "====================="
+    echo "   File Contents"
+    echo "====================="
+    cat "$output_file"
+    echo "====================="
+  else
+    echo "Failed to decrypt the file."
+  fi
 }
 
-# Function to manage a file
+find_editor() {
+  if command -v nvim &> /dev/null; then
+    echo "nvim"
+  elif command -v vim &> /dev/null; then
+    echo "vim"
+  elif command -v nano &> /dev/null; then
+    echo "nano"
+  elif command -v vi &> /dev/null; then
+    echo "vi"
+  else
+    echo ""
+  fi
+}
+
 manage_file() {
-    local file=$1
-
-    if [[ -f "$file" ]]; then
-        echo "The file '$file' is not encrypted yet."
-        read -p "Do you want to encrypt this file before managing it? (y/n): " choice
-        case "$choice" in
-            y|Y )
-                encrypt_file "$file"
-                ;;
-            n|N )
-                echo "Continuing without encryption."
-                cat "$file"
-                ;;
-            * )
-                echo "Invalid choice."
-                ;;
-        esac
-    elif [[ -f "${file}.gpg" ]]; then
-        decrypt_file "${file}.gpg"
-        read -p "Do you want to edit the file? (y/n): " edit_choice
-        if [[ "$edit_choice" =~ ^[Yy]$ ]]; then
-            vim "${file%.gpg}"  
-            echo "Re-encrypting the file..."
-            encrypt_file "${file%.gpg}"
-        else
-            echo "Re-encrypting the file without editing..."
-            encrypt_file "${file%.gpg}"
-        fi
+  local file="$BASE_DIR/$1.txt"
+  local editor=$(find_editor)
+  if [[ -z "$editor" ]]; then
+    echo "No suitable text editor found. Please install nvim, vim, nano, or vi."
+    exit 1
+  fi
+  if [[ -f "${file}.gpg" ]]; then
+    decrypt_file "${file}.gpg"
+    read -p "Do you want to edit the file? (y/n): " edit_choice
+    if [[ "$edit_choice" =~ ^[Yy]$ ]]; then
+      chmod +w "$file" # Ensure the file is writable
+      $editor "$file"
+      echo "Re-encrypting the file..."
+      encrypt_file "$file"
     else
-        echo "File does not exist. Creating a new one."
-        touch "$file"
-        encrypt_file "$file"
+      echo "Re-encrypting the file without editing..."
+      encrypt_file "$file"
     fi
+  elif [[ -f "$file" ]]; then
+    echo "The file '$file' is not encrypted yet."
+    read -p "Do you want to encrypt this file before managing it? (y/n): " choice
+    case "$choice" in
+      y|Y )
+        encrypt_file "$file"
+        ;;
+      n|N )
+        echo "Continuing without encryption."
+        chmod +w "$file" # Ensure the file is writable
+        $editor "$file"
+        ;;
+      * )
+        echo "Invalid choice."
+        ;;
+    esac
+  else
+    echo "File does not exist. Creating a new one."
+    touch "$file"
+    chmod +w "$file" # Ensure the file is writable
+    echo "You can now add content to the file using your preferred text editor."
+    read -p "Do you want to edit the new file now? (y/n): " edit_choice
+    if [[ "$edit_choice" =~ ^[Yy]$ ]]; then
+      $editor "$file"
+    fi
+    encrypt_file "$file"
+  fi
 }
 
-# Main script
-echo "GPG Manager Script"
-echo "1. Manage Passwords"
-echo "2. Manage GitHub Tokens"
-echo "3. Set up GPG"
-read -p "Choose an option (1/2/3): " option
+view_file() {
+  local file="$BASE_DIR/$1.txt"
+  if [[ -f "${file}.gpg" ]]; then
+    decrypt_file "${file}.gpg"
+    echo "Re-encrypting the file..."
+    encrypt_file "$file"
+  elif [[ -f "$file" ]]; then
+    echo "====================="
+    echo "   File Contents"
+    echo "====================="
+    cat "$file"
+    echo "====================="
+  else
+    echo "File does not exist."
+  fi
+}
 
-case $option in
+delete_item() {
+  read -p "Enter the number of the item to delete: " item_number
+  item_name=$(get_item_by_number "$item_number")
+  if [[ -n "$item_name" ]]; then
+    item_file="$BASE_DIR/$item_name.txt.gpg"
+    echo "You need to authenticate to delete this item."
+    if sudo -v; then
+      sudo rm -f "$item_file"
+      echo "Item '$item_name' deleted successfully."
+    else
+      echo "Authentication failed. Item not deleted."
+    fi
+  else
+    echo "Invalid item number."
+  fi
+}
+
+list_items() {
+  echo "====================="
+  echo "     Managed Items   "
+  echo "====================="
+  local i=1
+  for item in "$BASE_DIR"/*; do
+    basename_item=$(basename "$item" .txt.gpg)
+    basename_item=$(basename "$basename_item" .txt)
+    echo "$i. $basename_item"
+    ((i++))
+  done
+  echo "====================="
+}
+
+get_item_by_number() {
+  local number=$1
+  local i=1
+  for item in "$BASE_DIR"/*; do
+    if [[ $i -eq $number ]]; then
+      basename_item=$(basename "$item" .txt.gpg)
+      basename_item=$(basename "$basename_item" .txt)
+      echo "$basename_item"
+      return
+    fi
+    ((i++))
+  done
+  echo ""
+}
+
+add_item() {
+  read -p "Enter the name of the new item: " item_name
+  manage_file "$item_name"
+}
+
+clear_console() {
+  clear
+}
+
+main_menu() {
+  clear_console
+  echo "GPG Manager Script"
+  list_items
+  echo "1. View Item"
+  echo "2. Edit Item"
+  echo "3. Add New Item"
+  echo "4. Delete Item"
+  echo "5. Add New GPG Key"
+  echo "6. Exit"
+  read -p "Choose an option (1/2/3/4/5/6): " option
+  case $option in
     1)
-        echo "Password Management"
-        manage_file "$PASSWORD_FILE"
-        ;;
+      read -p "Enter the number of the item to view: " item_number
+      item_name=$(get_item_by_number "$item_number")
+      if [[ -n "$item_name" ]]; then
+        view_file "$item_name"
+      else
+        echo "Invalid item number."
+      fi
+      ;;
     2)
-        echo "GitHub Token Management"
-        manage_file "$GITHUB_TOKEN_FILE"
-        ;;
+      read -p "Enter the number of the item to edit: " item_number
+      item_name=$(get_item_by_number "$item_number")
+      if [[ -n "$item_name" ]]; then
+        manage_file "$item_name"
+      else
+        echo "Invalid item number."
+      fi
+      ;;
     3)
-        setup_gpg
-        ;;
+      add_item
+      ;;
+    4)
+      delete_item
+      ;;
+    5)
+      add_new_key
+      ;;
+    6)
+      echo "Exiting..."
+      exit 0
+      ;;
     *)
-        echo "Invalid option."
-        ;;
-esac
+      echo "Invalid option."
+      ;;
+  esac
+  read -p "Press Enter to continue..."
+}
+
+# Main script execution
+run_script() {
+  select_base_dir
+  check_dependencies
+  setup_gpg_agent
+
+  if ! grep -q "^GPG_SETUP_DONE=true" "$CONFIG_FILE"; then
+    if ! check_gpg_setup; then
+      echo "No existing GPG keys found. Setting up a new GPG key..."
+      setup_gpg
+    fi
+  fi
+  while true; do
+    main_menu
+  done
+}
+
+run_script
 

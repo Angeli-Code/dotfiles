@@ -48,19 +48,19 @@ display_menu() {
 update_projects_list() {
   mkdir -p "$(dirname "$PROJECTS_FILE")"
   find "$HOME" -type d -name ".git" 2>/dev/null | while read -r gitdir; do
-    repo_dir=$(dirname "$gitdir")
-    if [[ "$repo_dir" != */.* ]]; then
-      echo "$repo_dir"
-    fi
-  done | awk '{
-      paths[$0] = 1
-      for (i=1; i<NF; i++) {
-          prefix = ""
-          for (j=1; j<=i; j++) prefix = prefix $j "/"
-          if (prefix in paths) delete paths[prefix]
-      }
+  repo_dir=$(dirname "$gitdir")
+  if [[ "$repo_dir" != */.* ]]; then
+    echo "$repo_dir"
+  fi
+done | awk '{
+paths[$0] = 1
+for (i=1; i<NF; i++) {
+  prefix = ""
+  for (j=1; j<=i; j++) prefix = prefix $j "/"
+    if (prefix in paths) delete paths[prefix]
+    }
   } END {
-      for (path in paths) print path
+  for (path in paths) print path
   }' FS="/" > "$PROJECTS_FILE"
 }
 
@@ -127,7 +127,7 @@ while true; do
       if [ -n "$selected_dir" ]; then
         read -p "Session Name: " new_session_name
         tmux new-session -s "$new_session_name" -c "$selected_dir"
-        echo "Changed directory to $selected_dir"
+        exit 0
       else
         echo "No directory selected."
       fi
@@ -142,14 +142,17 @@ while true; do
         if [ -n "$session_name" ]; then
           if [ -n "$TMUX" ]; then
             tmux switch-client -t "$session_name"
+            exit 0
           else
             tmux attach-session -t "$session_name" 2>/dev/null
+            exit 0
           fi
         fi
       fi
       ;;
     d)
       tmux detach
+      exit 0
       ;;
     k)
       if [ -n "$sessions" ]; then
