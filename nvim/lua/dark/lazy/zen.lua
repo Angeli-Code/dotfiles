@@ -1,3 +1,5 @@
+local autocommands = require("dark.autocmds")
+
 return {
   "folke/zen-mode.nvim",
   opts = {
@@ -22,4 +24,15 @@ return {
       },
     },
   },
+  config = function(_, opts)
+    require("zen-mode").setup(opts)
+
+    local function toggle_zen_mode_and_opacity()
+      require("zen-mode").toggle()  -- Toggle Zen Mode using the plugin
+      autocommands.toggle_alacritty_opacity()  -- Call the function to toggle Alacritty opacity
+    end
+
+    vim.api.nvim_create_user_command("ZenToggle", toggle_zen_mode_and_opacity, {})
+  end
 }
+

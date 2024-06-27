@@ -1,6 +1,5 @@
 local M = {}
 
--- Function to make the current file executable
 function M.make_current_file_executable()
   local current_file = vim.fn.expand("%:p")
   if vim.fn.filereadable(current_file) == 0 then
@@ -18,7 +17,6 @@ function M.make_current_file_executable()
   })
 end
 
--- Function to open a Live Server displaying current file.
 function M.open_live_server()
   local server_script = "/home/dark/Documents/Programming/Scripts/live_server.sh"
   local filepath = vim.fn.expand("%:p")
@@ -53,7 +51,6 @@ function M.open_live_server()
   })
 end
 
--- Function to kill all live servers
 function M.kill_http_servers()
   vim.fn.jobstart("pkill -f 'python3 -m http.server'", {
     on_exit = function(_, code)
@@ -66,7 +63,6 @@ function M.kill_http_servers()
   })
 end
 
--- Function to fetch Java Documentation from API URLs
 function M.fetch_java_methods()
   local url = vim.fn.input("Enter the URL of the Java API documentation: ")
   if url == "" then
@@ -106,7 +102,6 @@ function M.fetch_java_methods()
   })
 end
 
--- Function to perform a Google search
 function M.search_google()
   local query = vim.fn.input("Google Search: ")
   if query == "" then
@@ -119,7 +114,6 @@ function M.search_google()
   vim.notify("Searching Google for: " .. query, vim.log.levels.INFO)
 end
 
--- Function to detach from the current Tmux session
 function M.detach_tmux_session()
   vim.fn.jobstart("tmux detach", {
     on_exit = function(_, code)
@@ -132,7 +126,6 @@ function M.detach_tmux_session()
   })
 end
 
--- Function to convert current txt file to PDF and open it
 function M.convert_and_open_pdf()
   local filepath = vim.fn.expand("%:p")
   local command = "python3 /home/dark/Documents/Programming/Scripts/libreconverter.py " .. filepath
@@ -160,7 +153,6 @@ function M.convert_and_open_pdf()
   })
 end
 
--- Function to create a new LibreNote (Neovim txt-->formatted docx-->pdf)
 function M.create_new_librenote()
   local new_filename = vim.fn.input("Enter the new note name (without extension): ")
   if new_filename == "" then
@@ -171,7 +163,6 @@ function M.create_new_librenote()
   vim.cmd("edit " .. full_path)
 end
 
--- Function to run the 
 function M.run_rocket_book_script()
   local script_path = "/usr/local/bin/openrocketbooks"
   vim.cmd("enew")
@@ -179,24 +170,27 @@ function M.run_rocket_book_script()
   vim.cmd("startinsert")
 end
 
--- Function to open Lazygit
 function M.open_lazygit()
   vim.cmd("term lazygit")
   vim.cmd("startinsert")
 end
 
--- Function to open the ghetto which-key commands file.
 function M.open_ghetto_which_key()
   vim.cmd("tabnew ~/.config/nvim/commands.txt")
   vim.cmd("setlocal readonly")
   vim.cmd("setlocal nomodifiable")
 end
 
--- Function to open Assembly Reference file. 
 function M.open_assembly_reference_file()
   vim.cmd("tabnew /home/dark/Documents/Notebooks/Assembly/assembly-instructions.txt")
   vim.cmd("setlocal readonly")
   vim.cmd("setlocal nomodifiable")
+end
+
+function M.make_opaque()
+  local script_path = "/usr/local/bin/zen"
+  vim.fn.jobstart(script_path)
+  require("zen-mode").toggle()
 end
 
 function M.setup()
@@ -212,6 +206,7 @@ function M.setup()
   vim.api.nvim_create_user_command("LazyGit", M.open_lazygit, {})
   vim.api.nvim_create_user_command("GhettoWhich", M.open_ghetto_which_key, {})
   vim.api.nvim_create_user_command("AssemblyReference", M.open_assembly_reference_file, {})
+  vim.api.nvim_create_user_command("Zen", M.make_opaque, {})
 end
 
 M.setup()
