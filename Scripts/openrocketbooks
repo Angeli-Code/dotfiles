@@ -31,7 +31,7 @@ def select_file(files):
 
 def open_with_feh(directory, file):
     full_path = os.path.join(directory, file)
-    os.system(f"feh --fullscreen --start-at '{full_path}' '{directory}'")
+    os.system("feh --fullscreen --start-at '{full_path}' '{directory}' 2>/dev/null ")
 
 def main():
     if not os.path.exists(target_dir):

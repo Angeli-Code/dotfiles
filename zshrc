@@ -116,13 +116,13 @@ alias projects='source /usr/local/bin/projects'
 
 # Function for Cooler Change Directory
 ccd() {
-    local home_dir="$HOME"
-    local command='echo "/\n..'${home_dir}'\n$(find / -type d ! -name ".*" 2>/dev/null)" | fzf --prompt="Change directory: "'
-    local selected_dir=$(eval $command)
-    if [ -n "$selected_dir" ]; then
-        cd "$selected_dir"
-        clear
-        ls
-    fi
+  local home_dir="$HOME"
+  local command='echo "/\n..'${home_dir}'\n$(find / -type d ! -name ".*" 2>/dev/null)" | fzf --prompt="Change directory: "'
+  local selected_dir=$(eval $command)
+  if [ -n "$selected_dir" ]; then
+    cd "$selected_dir"
+    clear
+    ls
+  fi
 }
 

@@ -185,10 +185,16 @@ function M.open_lazygit()
   vim.cmd("startinsert")
 end
 
--- Function to open the ghetto which-key commands file in a new buffer in read-only mode
+-- Function to open the ghetto which-key commands file.
 function M.open_ghetto_which_key()
-  -- Open the commands.txt file in a new tab and set it to read-only
   vim.cmd("tabnew ~/.config/nvim/commands.txt")
+  vim.cmd("setlocal readonly")
+  vim.cmd("setlocal nomodifiable")
+end
+
+-- Function to open Assembly Reference file. 
+function M.open_assembly_reference_file()
+  vim.cmd("tabnew /home/dark/Documents/Notebooks/Assembly/assembly-instructions.txt")
   vim.cmd("setlocal readonly")
   vim.cmd("setlocal nomodifiable")
 end
@@ -205,6 +211,7 @@ function M.setup()
   vim.api.nvim_create_user_command("OpenRocketbooks", M.run_rocket_book_script, {})
   vim.api.nvim_create_user_command("LazyGit", M.open_lazygit, {})
   vim.api.nvim_create_user_command("GhettoWhich", M.open_ghetto_which_key, {})
+  vim.api.nvim_create_user_command("AssemblyReference", M.open_assembly_reference_file, {})
 end
 
 M.setup()

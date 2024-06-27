@@ -15,8 +15,8 @@ vim.api.nvim_set_keymap("n", "<leader>zz", ":ZenMode<CR>", { noremap = true, sil
 vim.api.nvim_set_keymap("n", "<leader>TD", ":TmuxDetach<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<leader>LN", ":LibreNote<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<leader>LC", ":LibreConvert<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>AC", ":AsmConvert<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<leader>ME", ":MakeExecutable<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<leader>LG", ":LazyGit<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<leader>wk", ":GhettoWhich<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>AR", ":AssemblyReference<CR>", { noremap = true, silent = true })
 

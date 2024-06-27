@@ -142,9 +142,11 @@ while true; do
         if [ -n "$session_name" ]; then
           if [ -n "$TMUX" ]; then
             tmux switch-client -t "$session_name"
+            clear
             exit 0
           else
             tmux attach-session -t "$session_name" 2>/dev/null
+            clear
             exit 0
           fi
         fi

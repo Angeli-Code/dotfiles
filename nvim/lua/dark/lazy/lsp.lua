@@ -23,6 +23,9 @@ return {
       cmp_lsp.default_capabilities()
     )
 
+    local on_attach = function(client, bufnr)
+    end
+
     require("fidget").setup({})
     require("mason").setup()
     require("mason-lspconfig").setup({
@@ -30,14 +33,15 @@ return {
         "lua_ls",
         "rust_analyzer",
         "tsserver",
-        "jdtls",      -- Java LSP server
-        "clangd",     -- C/C++ LSP server
-        "asm_lsp",    -- Assembly LSP server
+        "jdtls",
+        "clangd",
+        "asm_lsp",
       },
       handlers = {
-        function(server_name) -- default handler (optional)
+        function(server_name)
           require("lspconfig")[server_name].setup {
-            capabilities = capabilities
+            capabilities = capabilities,
+            on_attach = on_attach,
           }
         end,
 
@@ -45,6 +49,7 @@ return {
           local lspconfig = require("lspconfig")
           lspconfig.lua_ls.setup {
             capabilities = capabilities,
+            on_attach = on_attach,
             settings = {
               Lua = {
                 diagnostics = {
@@ -59,6 +64,7 @@ return {
           local lspconfig = require("lspconfig")
           lspconfig.jdtls.setup {
             capabilities = capabilities,
+            on_attach = on_attach,
             cmd = { "jdtls" },
             settings = {
               java = {
@@ -77,6 +83,7 @@ return {
           local lspconfig = require("lspconfig")
           lspconfig.clangd.setup {
             capabilities = capabilities,
+            on_attach = on_attach,
           }
         end,
 
@@ -84,6 +91,7 @@ return {
           local lspconfig = require("lspconfig")
           lspconfig.asm_lsp.setup {
             capabilities = capabilities,
+            on_attach = on_attach,
           }
         end,
       }
@@ -94,7 +102,7 @@ return {
     cmp.setup({
       snippet = {
         expand = function(args)
-          require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+          require('luasnip').lsp_expand(args.body)
         end,
       },
       mapping = cmp.mapping.preset.insert({
@@ -102,11 +110,11 @@ return {
         ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
         ['<C-y>'] = cmp.mapping.confirm({ select = true }),
         ["<C-Space>"] = cmp.mapping.complete(),
-        ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Ensure Enter confirms selection
+        ['<CR>'] = cmp.mapping.confirm({ select = true }),
       }),
       sources = cmp.config.sources({
         { name = 'nvim_lsp' },
-        { name = 'luasnip' }, -- For luasnip users.
+        { name = 'luasnip' },
       }, {
           { name = 'buffer' },
         })
@@ -124,3 +132,4 @@ return {
     })
   end
 }
+

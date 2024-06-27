@@ -45,6 +45,9 @@ pulseaudio
 pavucontrol
 zathura
 python3-pip
+neofetch
+gimp
+sshpass
 
 
 LazyGit
