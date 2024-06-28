@@ -9,7 +9,7 @@ return {
       desc = "Diagnostics (Trouble)",
     },
     {
-      "<leader>td",
+      "<leader>TT",
       "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
       desc = "Buffer Diagnostics (Trouble)",
     },
@@ -24,7 +24,7 @@ return {
       desc = "LSP Definitions / references / ... (Trouble)",
     },
     {
-      "<leader>tl",
+      "<leader>tL",
       "<cmd>Trouble loclist toggle<cr>",
       desc = "Location List (Trouble)",
     },

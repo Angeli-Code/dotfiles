@@ -3,12 +3,12 @@
 ==============================================================================
 Navigation:
 <leader>pv = Exit file back to netrw
-
+------------------------------------------------------------------------------
 Management:
 <leader>l = Open lazy package manager GUI
 <leader>LG = Open Lazy Git
 <leader>ms = Open Mason LSP manager GUI
-
+------------------------------------------------------------------------------
 Plugins:
   - zen:
               <leader>zz = Toggle Zen-Mode
@@ -23,31 +23,29 @@ Plugins:
               <leader>8 = Open Harpooned file at position 8
               <leader>9 = Open Harpooned file at position 9
   - trouble:
-              <leader>ctd = Open Diagnostics
-              <leader>ctb = Open Buffer Dianostics
-              <leader>cts = Open Symbols
-              <leader>ctl = Open LSP Definitions
-              <leader>ctL = Open Location List
-              <leader>ctq = Quick fixes
+              <leader>tt = Open Diagnostics
+              <leader>TT = Open Buffer Dianostics
+              <leader>ts = Open Symbols
+              <leader>tl = Open LSP Definitions
+              <leader>TL = Open Location List
+              <leader>tq = Quick fixes
   - undo-tree: 
               <leader>ut = Open Undo-Tree
   - lsp:
-              <leader>li = LSP Info
-              <leader>lf = Format Document
-              <leader>lr = Rename Symbol
-              <leader>la = Code Action
-              <leader>ld = Show Diagnostics
-              <leader>ln = Go to Next Diagnostic
-              <leader>lp = Go to Previous Diagnostic
-              <leader>lh = Hover Documentation
-              <leader>ls = Signature Help        
+              <leader>ci = LSP Info
+              <leader>cf = Format Document
+              <leader>cr = Rename Symbol
+              <leader>ca = Code Action
+              <leader>cd = Show Diagnostics
+              <leader>cn = Go to Next Diagnostic
+              <leader>cp = Go to Previous Diagnostic
+              <leader>ch = Hover Documentation
+              <leader>cs = Signature Help        
   - telescope:
               <leader>ff = Find files
               <leader>fw = Live grep
               <leader>fg = Find Git files
-
-    
-
+------------------------------------------------------------------------------
 Personal Scripts:
 <leader>GS = Conduct a google search
 <leader>LS = Open a python server on current HTML file
@@ -58,3 +56,4 @@ Personal Scripts:
 <leader>LC = Convert current file into a formatted docx file and save as a PDF
 <leader>ME = Make current file executable
 <leader>wk = Open this file to view neovim keymaps
+=============================================================================

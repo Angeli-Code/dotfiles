@@ -19,4 +19,3 @@ vim.api.nvim_set_keymap("n", "<leader>ME", ":MakeExecutable<CR>", { noremap = tr
 vim.api.nvim_set_keymap("n", "<leader>LG", ":LazyGit<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<leader>wk", ":GhettoWhich<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<leader>AR", ":AssemblyReference<CR>", { noremap = true, silent = true })
-
