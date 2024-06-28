@@ -41,6 +41,34 @@ determine_project_type() {
   esac
 }
 
+get_compiler_and_commands() {
+  case "$PROJECT_TYPE" in
+    java)
+      COMPILER="javac"
+      CLASSNAME="${FILENAME%.*}"
+      RUN_COMMAND="java -cp . $CLASSNAME"
+      ;;
+    javafx)
+      COMPILER="javac --module-path $PATH_TO_FX --add-modules javafx.controls,javafx.fxml"
+      CLASSNAME="${FILENAME%.*}"
+      RUN_COMMAND="java --module-path $PATH_TO_FX --add-modules javafx.controls,javafx.fxml -cp . $CLASSNAME"
+      ;;
+    cpp)
+      COMPILER="g++"
+      RUN_COMMAND="./a.out"
+      ;;
+    c)
+      COMPILER="gcc"
+      RUN_COMMAND="./a.out"
+      ;;
+    assembly)
+      COMPILER="nasm"
+      LINKER="ld"
+      RUN_COMMAND="./a.out"
+      ;;
+  esac
+}
+
 create_temp_dir() {
   ORIGINAL_DIR=$(pwd)
   TEMP_DIR="$ORIGINAL_DIR/TEMP_DIR"
@@ -52,31 +80,34 @@ create_temp_dir() {
 
 copy_files() {
   cp "$FILENAME" "$TEMP_DIR"
-  for file in *."$FILE_EXTENSION"; do
+  for file in *.${FILE_EXTENSION}; do
+    cp "$file" "$TEMP_DIR"
+  done
+  for file in *.h; do
     cp "$file" "$TEMP_DIR"
   done
 }
 
-get_compiler_and_commands() {
-  case "$PROJECT_TYPE" in
-    java | javafx)
-      COMPILER="javac"
-      RUN_COMMAND="java"
-      ;;
-    cpp | c)
-      COMPILER="g++"
-      RUN_COMMAND="./a.out"
-      ;;
-    assembly)
-      COMPILER="nasm"
-      RUN_COMMAND="./a.out"
-      ;;
-  esac
-}
-
 compile_code() {
   cd "$TEMP_DIR" || exit
-  "$COMPILER" *."$FILE_EXTENSION" -o a.out
+  case "$PROJECT_TYPE" in
+    java | javafx)
+      eval "$COMPILER $FILENAME"
+      ;;
+    cpp)
+      $COMPILER *.cpp -o a.out
+      ;;
+    c)
+      $COMPILER *.c -o a.out
+      ;;
+    assembly)
+      $COMPILER -f elf64 "$FILENAME" -o "${FILENAME%.*}.o"
+      if [ "$?" -ne 0 ]; then
+        return 1
+      fi
+      $LINKER "${FILENAME%.*}.o" -o a.out
+      ;;
+  esac
   if [ "$?" -ne 0 ]; then
     return 1
   fi
@@ -86,15 +117,61 @@ compile_code() {
 handle_compilation_error() {
   ERROR_LOG="$ORIGINAL_DIR/error.txt"
   echo "Compilation failed with errors."
-  "$COMPILER" "$FILENAME" 2>"$ERROR_LOG"
-  echo "Error log saved to $ERROR_LOG"
+  while true; do
+    echo "Choose an option:"
+    echo "1. Save the error log to error.txt"
+    echo "2. Delete and exit without seeing errors"
+    read -p "Enter your choice (1/2): " error_choice
+    case "$error_choice" in
+      1)
+        case "$PROJECT_TYPE" in
+          java | javafx)
+            $COMPILER "$FILENAME" 2>"$ERROR_LOG"
+            ;;
+          cpp | c)
+            $COMPILER *.cpp -o a.out 2>"$ERROR_LOG"
+            ;;
+          assembly)
+            $COMPILER -f elf64 "$FILENAME" -o "${FILENAME%.*}.o" 2>"$ERROR_LOG"
+            ;;
+        esac
+        echo "Error log saved to $ERROR_LOG"
+        break
+        ;;
+      2)
+        echo "Exiting without saving errors."
+        break
+        ;;
+      *)
+        echo "Invalid choice. Please enter 1 or 2."
+        ;;
+    esac
+  done
   cleanup_temp_dir
 }
 
 handle_successful_compilation() {
   echo "Compilation successful."
-  "$RUN_COMMAND"
+  read -p "Would you like to run the program? (y/n) " run_program_choice
+  if [ "$run_program_choice" = "y" ]; then
+    cd "$TEMP_DIR" || exit
+    if [ -f "./a.out" ] || [ "$PROJECT_TYPE" == "java" ] || [ "$PROJECT_TYPE" == "javafx" ]; then
+      eval "$RUN_COMMAND"
+      RUN_STATUS=$?
+      echo -e "\nProgram finished with return value: $RUN_STATUS"
+    else
+      echo "Error: a.out not found in $TEMP_DIR"
+    fi
+    ask_overwrite_original
+  fi
   cleanup_temp_dir
+}
+
+ask_overwrite_original() {
+  read -p "Would you like to overwrite the original directory with the contents of the temp directory? (y/n) " overwrite_choice
+  if [ "$overwrite_choice" = "y" ]; then
+    cp -r "$TEMP_DIR"/* "$ORIGINAL_DIR"
+  fi
 }
 
 cleanup_temp_dir() {
@@ -105,9 +182,9 @@ main() {
   parse_arguments "$@"
   get_file_extension
   determine_project_type
+  get_compiler_and_commands
   create_temp_dir
   copy_files
-  get_compiler_and_commands
   if ! compile_code; then
     handle_compilation_error
   else

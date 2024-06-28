@@ -103,7 +103,7 @@ source $ZSH/oh-my-zsh.sh
 # Java Pathing
 export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 export PATH=$JAVA_HOME/bin:$PATH
-export PATH_TO_FX=/home/dark/Management/javafx-sdk-23/lib
+export PATH_TO_FX=/home/dark/Management/javafx-sdk-22.0.1/lib
 
 # Cargo Pathing
 export PATH="$HOME/.cargo/bin:$PATH"
