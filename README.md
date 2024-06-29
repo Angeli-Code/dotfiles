@@ -3,11 +3,9 @@ This repository contains all of my configuration files and QOL scripts that make
 
 ## Contents
 - Neovim: Text Editor (BTW), configuration files. Built from "scatch". A lot of structural and plugin inspiration from LazyVim and Primeagen's neovimrc.
-- Picom: Compositor that lets me make windows Opaque, blurred, and round out window corners.
 - i3: Window Manager that I use for quick navigation between workspaces.
 - Alacritty: Terminal Emulator. 
 - Scripts:
-    - zen: quick script for toggling an opaque background in the terminal. Also used in tandum with Zen-Mode plugin in Neovim.
     - debinstall: automates and handles the installation process of .deb files.
     - networkadmin: opens up orbi admin login url.
     - projects: uses fzf to list all git repositories and allows me to cd into that dir.

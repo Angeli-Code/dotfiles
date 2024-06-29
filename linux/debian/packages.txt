@@ -48,6 +48,7 @@ python3-pip
 neofetch
 gimp
 sshpass
+brightnessctl
 
 
 LazyGit

@@ -186,11 +186,5 @@ workspace 6 output HDMI-1
 workspace 7 output HDMI-1
 workspace 8 output HDMI-1
 
-# Wallpaper Configuration
-exec --no-startup-id feh --bg-fill /home/dark/Pictures/Wallpapers/wallpaper.png
-
 # Remove Window Borders
 default_border pixel 0
-
-# All Window Transparency/Blur 
-exec --no-startup-id picom >/dev/null 2>&1 &

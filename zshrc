@@ -114,10 +114,10 @@ alias vim='nvim'
 # Alias for projects script
 alias projects='source /usr/local/bin/projects'
 
-# Function for Cooler Change Directory
-ccd() {
+# Change directories using fzf from root directory
+crd() {
   local home_dir="$HOME"
-  local command='echo "/\n..'${home_dir}'\n$(find / -type d ! -name ".*" 2>/dev/null)" | fzf --prompt="Change directory: "'
+  local command='echo "/\n..'${home_dir}'\n$(find / -type d 2>/dev/null)" | fzf --prompt="Change directory: "'
   local selected_dir=$(eval $command)
   if [ -n "$selected_dir" ]; then
     cd "$selected_dir"
@@ -126,3 +126,13 @@ ccd() {
   fi
 }
 
+# Change directories using fzf from current directory
+ccd() {
+  local command='echo "$(find . -type d ! -path "*/.*" 2>/dev/null)" | fzf --prompt="Change directory: "'
+  local selected_dir=$(eval $command)
+  if [ -n "$selected_dir" ]; then
+    cd "$selected_dir"
+    clear
+    ls
+  fi
+}

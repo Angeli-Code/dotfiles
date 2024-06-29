@@ -10,8 +10,6 @@ Management:
 <leader>ms = Open Mason LSP manager GUI
 ------------------------------------------------------------------------------
 Plugins:
-  - zen:
-              <leader>zz = Toggle Zen-Mode
   - harpoon:
               <leader>1 = Open Harpooned file at position 1
               <leader>2 = Open Harpooned file at position 2

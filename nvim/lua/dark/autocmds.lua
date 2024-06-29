@@ -187,12 +187,6 @@ function M.open_assembly_reference_file()
   vim.cmd("setlocal nomodifiable")
 end
 
-function M.make_opaque()
-  local script_path = "/usr/local/bin/zen"
-  vim.fn.jobstart(script_path)
-  require("zen-mode").toggle()
-end
-
 function M.setup()
   vim.api.nvim_create_user_command("LiveServer", M.open_live_server, {})
   vim.api.nvim_create_user_command("KillLiveServers", M.kill_http_servers, {})
@@ -206,7 +200,6 @@ function M.setup()
   vim.api.nvim_create_user_command("LazyGit", M.open_lazygit, {})
   vim.api.nvim_create_user_command("GhettoWhich", M.open_ghetto_which_key, {})
   vim.api.nvim_create_user_command("AssemblyReference", M.open_assembly_reference_file, {})
-  vim.api.nvim_create_user_command("Zen", M.make_opaque, {})
 end
 
 M.setup()

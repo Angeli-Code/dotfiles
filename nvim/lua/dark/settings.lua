@@ -20,6 +20,10 @@ vim.opt.isfname:append("@-@")
 vim.opt.updatetime = 50
 vim.opt.colorcolumn = "80"
 
+-- Disable netrw (I have mixed feelings about using netrw vs neo-tree)
+-- vim.g.loaded_netrwPlugin = 1
+-- vim.g.loaded_netrw = 1
+
 -- Use xsel for clipboard integration
 if vim.fn.executable('xsel') == 1 then
   vim.opt.clipboard:append { 'unnamedplus' }
