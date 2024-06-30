@@ -10,13 +10,17 @@ return {
       ["]"] = { name = "+next" },
       ["["] = { name = "+prev" },
 
+      -- Oil
+      ["<leader>o"] = { name = "+Oil" },
+
+
       -- Coding 
       ["<leader>c"] = { name = "+Code" },
       ["<leader>ct"] = { name = "+Undo-Tree" },
       ["<leader>cT"] = { name = "+Trouble" },
 
       -- Finder
-      ["<leader>f"] = { name = "+Finder" },
+      ["<leader>f"] = { name = "+Telescope" },
 
       --Harpoon
       ["<leader>h"] = { name = "+Harpoon"},

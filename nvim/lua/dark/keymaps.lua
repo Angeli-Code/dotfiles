@@ -1,11 +1,11 @@
 -- Basic Keymaps
 vim.g.mapleader = " "
-vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
 vim.api.nvim_set_keymap("n", "<leader>td", ":TmuxDetach<CR>", { noremap = true, silent = true })
 
 -- Management Keymaps
 vim.api.nvim_set_keymap("n", "<leader>l", ":Lazy home<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<leader>ms",":Mason<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>o",":Oil<CR>", { noremap = true, silent = true })
 
 -- Keymaps that connect to Auto-Commands
 vim.api.nvim_set_keymap("n", "<leader>tgs", ":GoogleSearch<CR>", { noremap = true, silent = true })

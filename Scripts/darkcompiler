@@ -158,7 +158,7 @@ handle_successful_compilation() {
     if [ -f "./a.out" ] || [ "$PROJECT_TYPE" == "java" ] || [ "$PROJECT_TYPE" == "javafx" ]; then
       eval "$RUN_COMMAND"
       RUN_STATUS=$?
-      echo -e "\nProgram finished with return value: $RUN_STATUS"
+      echo -e "Program finished with return value: $RUN_STATUS"
     else
       echo "Error: a.out not found in $TEMP_DIR"
     fi
