@@ -11,22 +11,22 @@ Management:
 ------------------------------------------------------------------------------
 Plugins:
   - harpoon:
-              <leader>1 = Open Harpooned file at position 1
-              <leader>2 = Open Harpooned file at position 2
-              <leader>3 = Open Harpooned file at position 3
-              <leader>4 = Open Harpooned file at position 4
-              <leader>5 = Open Harpooned file at position 5
-              <leader>6 = Open Harpooned file at position 6
-              <leader>7 = Open Harpooned file at position 7
-              <leader>8 = Open Harpooned file at position 8
-              <leader>9 = Open Harpooned file at position 9
+              <leader>h1 = Open Harpooned file at position 1
+              <leader>h2 = Open Harpooned file at position 2
+              <leader>h3 = Open Harpooned file at position 3
+              <leader>h4 = Open Harpooned file at position 4
+              <leader>h5 = Open Harpooned file at position 5
+              <leader>h6 = Open Harpooned file at position 6
+              <leader>h7 = Open Harpooned file at position 7
+              <leader>h8 = Open Harpooned file at position 8
+              <leader>h9 = Open Harpooned file at position 9
   - trouble:
-              <leader>tt = Open Diagnostics
-              <leader>TT = Open Buffer Dianostics
-              <leader>ts = Open Symbols
-              <leader>tl = Open LSP Definitions
-              <leader>TL = Open Location List
-              <leader>tq = Quick fixes
+              <leader>ctt = Open Diagnostics
+              <leader>ctd = Open Buffer Dianostics
+              <leader>cts = Open Symbols
+              <leader>ctl = Open LSP Definitions
+              <leader>ctL = Open Location List
+              <leader>ctq = Quick fixes
   - undo-tree: 
               <leader>ut = Open Undo-Tree
   - lsp:

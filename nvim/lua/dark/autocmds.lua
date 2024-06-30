@@ -163,22 +163,9 @@ function M.create_new_librenote()
   vim.cmd("edit " .. full_path)
 end
 
-function M.run_rocket_book_script()
-  local script_path = "/usr/local/bin/openrocketbooks"
-  vim.cmd("enew")
-  vim.cmd("terminal " .. script_path)
-  vim.cmd("startinsert")
-end
-
 function M.open_lazygit()
   vim.cmd("term lazygit")
   vim.cmd("startinsert")
-end
-
-function M.open_ghetto_which_key()
-  vim.cmd("tabnew ~/.config/nvim/commands.txt")
-  vim.cmd("setlocal readonly")
-  vim.cmd("setlocal nomodifiable")
 end
 
 function M.open_assembly_reference_file()
@@ -196,9 +183,7 @@ function M.setup()
   vim.api.nvim_create_user_command("LibreConvert", M.convert_and_open_pdf, {})
   vim.api.nvim_create_user_command("LibreNote", M.create_new_librenote, {})
   vim.api.nvim_create_user_command("MakeExecutable", M.make_current_file_executable, {})
-  vim.api.nvim_create_user_command("OpenRocketbooks", M.run_rocket_book_script, {})
   vim.api.nvim_create_user_command("LazyGit", M.open_lazygit, {})
-  vim.api.nvim_create_user_command("GhettoWhich", M.open_ghetto_which_key, {})
   vim.api.nvim_create_user_command("AssemblyReference", M.open_assembly_reference_file, {})
 end
 

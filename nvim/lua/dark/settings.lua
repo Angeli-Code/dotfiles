@@ -20,7 +20,7 @@ vim.opt.isfname:append("@-@")
 vim.opt.updatetime = 50
 vim.opt.colorcolumn = "80"
 
--- Disable netrw (I have mixed feelings about using netrw vs neo-tree)
+-- Disable netrw (I have mixed feelings about using netrw vs oil vs neo-tree)
 -- vim.g.loaded_netrwPlugin = 1
 -- vim.g.loaded_netrw = 1
 

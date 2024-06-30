@@ -27,14 +27,14 @@ return {
       local opts = { noremap = true, silent = true }
       local keymap = vim.api.nvim_buf_set_keymap
       keymap(bufnr, 'n', '<leader>ci', '<cmd>LspInfo<CR>', opts)
-      keymap(bufnr, 'n', '<leader>cf', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
-      keymap(bufnr, 'n', '<leader>lr', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+      -- keymap(bufnr, 'n', '<leader>cf', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
+      -- keymap(bufnr, 'n', '<leader>lr', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
       keymap(bufnr, 'n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-      keymap(bufnr, 'n', '<leader>cd', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
-      keymap(bufnr, 'n', '<leader>cn', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
-      keymap(bufnr, 'n', '<leader>cp', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
+      -- keymap(bufnr, 'n', '<leader>cd', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
+      -- keymap(bufnr, 'n', '<leader>cn', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
+      -- keymap(bufnr, 'n', '<leader>cp', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
       keymap(bufnr, 'n', '<leader>ch', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
-      keymap(bufnr, 'n', '<leader>cs', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+      -- keymap(bufnr, 'n', '<leader>cs', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
     end
 
     require("fidget").setup({})

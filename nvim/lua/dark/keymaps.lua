@@ -1,25 +1,19 @@
 -- Basic Keymaps
 vim.g.mapleader = " "
 vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
+vim.api.nvim_set_keymap("n", "<leader>td", ":TmuxDetach<CR>", { noremap = true, silent = true })
 
 -- Management Keymaps
 vim.api.nvim_set_keymap("n", "<leader>l", ":Lazy home<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<leader>ms",":Mason<CR>", { noremap = true, silent = true })
 
 -- Keymaps that connect to Auto-Commands
-vim.api.nvim_set_keymap("n", "<leader>GS", ":GoogleSearch<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>LS", ":LiveServer<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>KS", ":KillLiveServers<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>PJ", ":ParseJavadoc<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>zz", ":Zen<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>TD", ":TmuxDetach<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>LN", ":LibreNote<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>LC", ":LibreConvert<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>ME", ":MakeExecutable<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>LG", ":LazyGit<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>wk", ":GhettoWhich<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>AR", ":AssemblyReference<CR>", { noremap = true, silent = true })
-
-
-vim.api.nvim_set_keymap("n", "<leader>nt", ":ToggleTerm<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>cd", ":FuzzyCD<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>tgs", ":GoogleSearch<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>tso", ":LiveServer<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>tsk", ":KillLiveServers<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>tpj", ":ParseJavadoc<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>tln", ":LibreNote<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>tlc", ":LibreConvert<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>ta", ":AssemblyReference<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>te", ":MakeExecutable<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>mG", ":LazyGit<CR>", { noremap = true, silent = true })
